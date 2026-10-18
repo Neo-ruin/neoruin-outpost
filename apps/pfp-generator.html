@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Observer PFP Generator — NEORUIN OUTPOST</title>
+<meta name="description" content="Create an archive-inspired profile picture stamped with your observer codename.">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html">NEORUIN<small>OUTPOST</small></a>
+    <nav class="main">
+      <a href="../index.html#apps">← ALL APPS</a>
+      <a href="https://neoruins.com" target="_blank" rel="noopener">THE ARCHIVE ↗</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<section class="block">
+  <div class="sec-head"><h2>OBSERVER PFP GENERATOR</h2><span class="hint mono">STATUS: ONLINE</span></div>
+  <p style="color:var(--dim);margin-bottom:26px;max-width:640px">Type your observer codename, pick a seal, generate your mark. Yours to keep — Discord, X, anywhere.</p>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="field">
+        <label for="codename">ENTER OBSERVER CODENAME</label>
+        <input type="text" id="codename" maxlength="20" placeholder="OBSERVER-17" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>SEAL VARIANT</label>
+        <div class="seal-pick">
+          <button class="btn" data-seal="diamond">DIAMOND</button>
+          <button class="btn" data-seal="rings">RINGS</button>
+          <button class="btn" data-seal="bars">BARS</button>
+        </div>
+      </div>
+      <div class="cta-row" style="justify-content:flex-start;margin-top:8px">
+        <button class="btn solid" id="genBtn">GENERATE</button>
+        <button class="btn" id="dlBtn" disabled>DOWNLOAD PNG</button>
+      </div>
+    </div>
+    <div class="panel center">
+      <canvas id="pfp" class="preview" width="800" height="800"></canvas>
+      <p class="mono" style="font-size:10px;letter-spacing:2px;color:var(--dim)">800 × 800 • SQUARE • PROFILE-READY</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<footer class="site">
+  <div class="wrap"><div class="fine">NEORUIN OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
+</footer>
+
+<script>
+const GOLD = '#c9a227', CREAM = '#e8e0d0', DIM = '#8a8478';
+let seal = 'diamond';
+
+function drawSeal(x, kind, cx, cy, R) {
+  x.strokeStyle = GOLD; x.lineWidth = 5;
+  if (kind === 'diamond') {
+    for (const r of [R, R*0.68, R*0.38]) {
+      x.beginPath();
+      x.moveTo(cx, cy-r); x.lineTo(cx+r, cy); x.lineTo(cx, cy+r); x.lineTo(cx-r, cy);
+      x.closePath(); x.stroke();
+    }
+    x.fillStyle = GOLD;
+    x.beginPath(); x.arc(cx, cy, 12, 0, Math.PI*2); x.fill();
+  } else if (kind === 'rings') {
+    for (const r of [R, R*0.7, R*0.42]) { x.beginPath(); x.arc(cx, cy, r, 0, Math.PI*2); x.stroke(); }
+    x.beginPath(); x.moveTo(cx-R, cy); x.lineTo(cx+R, cy); x.stroke();
+    x.beginPath(); x.moveTo(cx, cy-R); x.lineTo(cx, cy+R); x.stroke();
+    x.fillStyle = GOLD;
+    x.beginPath(); x.arc(cx, cy, 10, 0, Math.PI*2); x.fill();
+  } else { // bars
+    const n = 5, gap = R*2/n;
+    for (let i = 0; i < n; i++) {
+      const bx = cx - R + i*gap + gap*0.18, bw = gap*0.64;
+      const bh = (i % 2 === 0 ? R*1.5 : R*0.9);
+      x.strokeRect(bx, cy-bh/2, bw, bh);
+    }
+    x.beginPath(); x.arc(cx, cy, 12, 0, Math.PI*2); x.fillStyle = GOLD; x.fill();
+  }
+}
+
+function generate() {
+  const c = document.getElementById('pfp');
+  const x = c.getContext('2d');
+  const S = 800;
+  const name = (document.getElementById('codename').value.trim().toUpperCase() || 'OBSERVER').slice(0,20);
+
+  // background
+  x.fillStyle = '#0b0a08'; x.fillRect(0,0,S,S);
+  // faint rings
+  x.strokeStyle = 'rgba(201,162,39,0.07)'; x.lineWidth = 2;
+  for (let r = 90; r < 560; r += 80) { x.beginPath(); x.arc(S/2, S/2-40, r, 0, Math.PI*2); x.stroke(); }
+  // vignette
+  const vg = x.createRadialGradient(S/2,S/2-40,120, S/2,S/2-40,560);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,0.5)');
+  x.fillStyle = vg; x.fillRect(0,0,S,S);
+
+  // frame
+  x.strokeStyle = GOLD; x.lineWidth = 6; x.strokeRect(28,28,S-56,S-56);
+  x.strokeStyle = 'rgba(201,162,39,0.35)'; x.lineWidth = 2; x.strokeRect(48,48,S-96,S-96);
+
+  // seal
+  drawSeal(x, seal, S/2, S/2-60, 150);
+
+  // codename
+  x.textAlign = 'center'; x.fillStyle = CREAM;
+  x.font = 'bold 54px Georgia';
+  // shrink to fit
+  let fs = 54;
+  while (x.measureText(name).width > S-160 && fs > 24) { fs -= 4; x.font = `bold ${fs}px Georgia`; }
+  x.fillText(name, S/2, S/2+170);
+
+  // footer
+  x.fillStyle = DIM; x.font = '22px monospace';
+  x.fillText('N E O R U I N   O U T P O S T', S/2, S-90);
+
+  document.getElementById('dlBtn').disabled = false;
+}
+
+document.querySelectorAll('.seal-pick button').forEach(b => {
+  b.addEventListener('click', () => {
+    seal = b.dataset.seal;
+    document.querySelectorAll('.seal-pick button').forEach(o => o.classList.remove('solid'));
+    b.classList.add('solid');
+    generate();
+  });
+});
+document.querySelector('.seal-pick button').classList.add('solid');
+document.getElementById('genBtn').addEventListener('click', generate);
+document.getElementById('codename').addEventListener('keydown', e => { if (e.key === 'Enter') generate(); });
+document.getElementById('dlBtn').addEventListener('click', () => {
+  const c = document.getElementById('pfp');
+  const name = (document.getElementById('codename').value.trim().toLowerCase() || 'observer').replace(/[^a-z0-9-]/g,'');
+  c.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `neoruin-pfp-${name}.png`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  });
+});
+generate();
+</script>
+</body>
+</html>

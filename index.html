@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEORUIN OUTPOST — Creator Hub</title>
+<meta name="description" content="The creator hub for NEORUINS: broadcasts, experiments, updates, merch, and community projects.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="index.html">NEORUIN<small>OUTPOST</small></a>
+    <nav class="main">
+      <a href="#transmissions">TRANSMISSIONS</a>
+      <a href="#broadcasts">BROADCASTS</a>
+      <a href="#apps">APPS</a>
+      <a href="#merch">MERCH</a>
+      <a href="https://neoruins.com" target="_blank" rel="noopener">THE ARCHIVE ↗</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="kicker mono">CREATOR HUB • BROADCASTS • EXPERIMENTS • COMMUNITY</div>
+  <h1>NEORUIN OUTPOST</h1>
+  <p class="tag">The creator hub for broadcasts, experiments, updates, and community projects.</p>
+  <div class="cta-row">
+    <a class="btn" href="#broadcasts">WATCH</a>
+    <a class="btn solid" href="#apps">APPS</a>
+    <a class="btn" href="#merch">MERCH</a>
+  </div>
+</section>
+
+<div class="wrap">
+
+<section class="block" id="transmissions">
+  <div class="sec-head"><h2>LATEST TRANSMISSIONS</h2><span class="hint mono">MANUAL FEED • NEWEST FIRST</span></div>
+  <div id="feed"></div>
+</section>
+
+<section class="block" id="broadcasts">
+  <div class="sec-head"><h2>CLIPS &amp; BROADCASTS</h2><span class="hint mono">TWITCH • YOUTUBE</span></div>
+  <div class="grid2">
+    <div class="panel">
+      <span class="status live">● TWITCH</span>
+      <h3>Live &amp; Past Broadcasts</h3>
+      <div class="embed">
+        <iframe src="https://player.twitch.tv/?channel=neoruin_&parent=neoruin.com&parent=neo-ruin.github.io&muted=true"
+                allowfullscreen loading="lazy" title="neoruin_ on Twitch"></iframe>
+      </div>
+      <p class="mt"><a href="https://twitch.tv/neoruin_" target="_blank" rel="noopener">twitch.tv/neoruin_ ↗</a></p>
+    </div>
+    <div class="panel">
+      <span class="status live">● YOUTUBE</span>
+      <h3>Videos &amp; Shorts</h3>
+      <p>Streams, lore drops, and experiments — everything lands here.</p>
+      <p><a class="btn" href="https://www.youtube.com/@neoruin_" target="_blank" rel="noopener">WATCH ON YOUTUBE</a></p>
+      <p style="margin-top:14px"><a href="https://tiktok.com/@neoruin_" target="_blank" rel="noopener">TikTok ↗</a> &nbsp;·&nbsp; <a href="https://twitter.com/Neoruins" target="_blank" rel="noopener">X ↗</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="apps">
+  <div class="sec-head"><h2>FEATURED APPLICATIONS</h2><span class="hint mono">EXPERIMENTS • NO ACCOUNT NEEDED</span></div>
+  <div class="apps">
+    <div class="panel app-card">
+      <span class="status online">ONLINE</span>
+      <h3>Observer PFP Generator</h3>
+      <p>Create an archive-inspired profile image stamped with your own observer codename. Download it, wear it anywhere.</p>
+      <a class="btn" href="apps/pfp-generator.html">LAUNCH</a>
+    </div>
+    <div class="panel app-card">
+      <span class="status soon">COMING SOON</span>
+      <h3>Charge the Archive</h3>
+      <p>Incremental clicker experiment. Harvest signal fragments, buy upgrades, chase achievements.</p>
+      <a class="btn" href="apps/charge-archive.html">PREVIEW</a>
+    </div>
+    <div class="panel app-card">
+      <span class="status soon">COMING SOON</span>
+      <h3>Archive Coinflip</h3>
+      <p>A ceremonial heads-or-tails decision tool, archive style.</p>
+      <a class="btn" href="apps/coinflip.html">PREVIEW</a>
+    </div>
+    <div class="panel app-card">
+      <span class="status soon">COMING SOON</span>
+      <h3>Signal Decode</h3>
+      <p>A garbled transmission scrolls past. Type the cleartext before the timer dies.</p>
+      <a class="btn" href="apps/signal-decode.html">PREVIEW</a>
+    </div>
+    <div class="panel app-card">
+      <span class="status soon">COMING SOON</span>
+      <h3>Tumbler Calibration</h3>
+      <p>Timing-based dial puzzle. Stop all three tumblers on their marks.</p>
+      <a class="btn" href="apps/tumbler-calibration.html">PREVIEW</a>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="merch">
+  <div class="sec-head"><h2>MERCH</h2><span class="hint mono">OFFICIAL STORE</span></div>
+  <div class="panel center">
+    <h3>Support the Project</h3>
+    <p>Apparel, collectibles, and future drops — every purchase keeps the outpost running.</p>
+    <a class="btn solid" href="https://neoruin-shop.fourthwall.com" target="_blank" rel="noopener">ENTER SHOP</a>
+  </div>
+</section>
+
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="fine">
+      NEORUIN OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>
+      <a href="https://neoruins.com">THE ARCHIVE</a> · <a href="https://neoruin-shop.fourthwall.com" target="_blank" rel="noopener">SHOP</a><br>
+      © 2026 Angelo Padula. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script>
+// Manual transmissions feed — newest first. Edit freely.
+const TRANSMISSIONS = [
+  { date: '10.18.2026', text: 'Outpost online. PFP Generator deployed — go make your mark.' },
+  { date: '10.18.2026', text: 'The Archive Vault opens to the public. neoruins.com/vault.html' },
+];
+const feed = document.getElementById('feed');
+feed.innerHTML = TRANSMISSIONS.map(t =>
+  `<div class="feed-item"><div class="date">[${t.date}]</div><div class="txt">${t.text}</div></div>`
+).join('');
+</script>
+</body>
+</html>
