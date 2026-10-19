@@ -4,7 +4,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Charge the Archive — NEORUIN™ OUTPOST</title>
+<meta name="description" content="Incremental clicker experiment. Harvest signal fragments, buy upgrades, chase achievements.">
 <link rel="stylesheet" href="../styles.css">
+<style>
+  .game-wrap{max-width:820px;margin:0 auto;text-align:center}
+  .game-wrap h2{font-size:30px;letter-spacing:4px;color:var(--gold);font-weight:normal;margin:14px 0}
+  .game-wrap .lede{color:var(--dim);max-width:560px;margin:0 auto 8px;font-size:15px}
+  #fragCount{font-family:ui-monospace,Menlo,monospace;font-size:clamp(34px,6vw,54px);color:var(--gold);letter-spacing:3px;margin:14px 0 2px}
+  #fragRate{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:3px;color:var(--dim);margin-bottom:8px}
+  #core{width:190px;height:190px;border-radius:50%;margin:22px auto;cursor:pointer;user-select:none;
+    border:3px solid var(--gold);position:relative;
+    background:radial-gradient(circle at 38% 32%, #332a12 0%, #171208 55%, #0b0a08 100%);
+    box-shadow:0 0 44px rgba(201,162,39,.25), inset 0 0 30px rgba(201,162,39,.14);
+    display:flex;align-items:center;justify-content:center;touch-action:manipulation;
+    transition:transform .06s}
+  #core:active{transform:scale(.94)}
+  #core .inner{font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:4px;color:var(--gold);text-align:center;line-height:2}
+  #core .pulse{position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--gold);opacity:0;pointer-events:none}
+  #core.pulsing .pulse{animation:pulse .5s ease-out}
+  @keyframes pulse{from{transform:scale(1);opacity:.7}to{transform:scale(1.35);opacity:0}}
+  .float{position:absolute;font-family:ui-monospace,Menlo,monospace;color:var(--gold-hi);font-size:16px;
+    pointer-events:none;animation:floatup .9s ease-out forwards;letter-spacing:1px}
+  @keyframes floatup{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-70px)}}
+  #coreZone{position:relative;display:inline-block}
+  .shop{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:26px auto;max-width:760px;text-align:left}
+  .upgrade{border:1px solid var(--line);background:var(--panel);padding:16px;cursor:pointer;transition:border-color .15s}
+  .upgrade:hover{border-color:var(--gold)}
+  .upgrade.cant{opacity:.45;cursor:not-allowed}
+  .upgrade h4{font-size:14px;letter-spacing:2px;color:var(--cream);font-weight:normal;margin-bottom:4px}
+  .upgrade h4 .lvl{color:var(--gold);font-family:ui-monospace,Menlo,monospace;font-size:11px}
+  .upgrade p{font-size:12px;color:var(--dim);margin-bottom:8px}
+  .upgrade .cost{font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:1px;color:var(--gold)}
+  .sec-title{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:4px;color:var(--dim);margin:30px 0 12px}
+  #achievements{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:760px;margin:0 auto}
+  .ach{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;padding:8px 12px;border:1px solid var(--line);color:var(--dim)}
+  .ach.won{color:#000;background:var(--gold);border-color:var(--gold);font-weight:700}
+  #toast{min-height:26px;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:2px;color:var(--gold-hi);margin:10px 0}
+  .danger{margin-top:26px}
+  .danger button{background:none;border:1px solid var(--red);color:var(--red);font-family:ui-monospace,Menlo,monospace;
+    font-size:10px;letter-spacing:2px;padding:10px 18px;cursor:pointer}
+</style>
 </head>
 <body>
 <header class="site">
@@ -17,16 +56,162 @@
   </div>
 </header>
 <div class="wrap">
-<section class="block center">
-  <span class="status soon">COMING SOON</span>
-  <h2 style="font-size:30px;letter-spacing:4px;color:var(--gold);font-weight:normal;margin:14px 0">Charge the Archive</h2>
-  <p style="color:var(--dim);max-width:520px;margin:0 auto 28px">Incremental clicker experiment. Harvest signal fragments, buy upgrades, chase achievements.</p>
-  <p class="mono" style="font-size:11px;letter-spacing:2px;color:var(--dim)">THIS EXPERIMENT IS STILL CALIBRATING.<br>CHECK THE TRANSMISSIONS FEED FOR LAUNCH NEWS.</p>
-  <div class="mt"><a class="btn" href="../index.html#apps">BACK TO APPS</a></div>
+<section class="block">
+  <div class="game-wrap">
+    <span class="status online">ONLINE</span>
+    <h2>CHARGE THE ARCHIVE</h2>
+    <p class="lede">Incremental clicker experiment. Harvest signal fragments, buy upgrades, chase achievements. Progress saves on this device.</p>
+    <div id="fragCount">0</div>
+    <div id="fragRate">+0 / CLICK · +0 / SEC</div>
+    <div id="toast"></div>
+    <div id="coreZone">
+      <div id="core"><div class="pulse"></div><div class="inner">HARVEST<br>◉</div></div>
+    </div>
+    <div class="sec-title">— UPGRADES —</div>
+    <div class="shop" id="shop"></div>
+    <div class="sec-title">— ACHIEVEMENTS —</div>
+    <div id="achievements"></div>
+    <div class="danger"><button id="resetBtn">RESET PROGRESS</button></div>
+    <div class="mt"><a class="btn" href="../index.html#apps">BACK TO APPS</a></div>
+  </div>
 </section>
 </div>
 <footer class="site">
   <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
 </footer>
+<script>
+const fragEl = document.getElementById('fragCount');
+const rateEl = document.getElementById('fragRate');
+const core = document.getElementById('core');
+const coreZone = document.getElementById('coreZone');
+const shopEl = document.getElementById('shop');
+const achEl = document.getElementById('achievements');
+const toast = document.getElementById('toast');
+
+const UPGRADES = [
+  { id: 'click', name: 'AMPLIFY ARRAY', desc: '+1 fragment per harvest', base: 25, growth: 1.6 },
+  { id: 'auto', name: 'AUTO-HARVESTER', desc: '+1 fragment per second', base: 60, growth: 1.75 },
+  { id: 'core', name: 'RESONANCE COIL', desc: 'Doubles ALL gains', base: 400, growth: 2.4 },
+];
+const ACHIEVEMENTS = [
+  { id: 'spark', name: 'FIRST SPARK', check: s => s.totalEarned >= 1 },
+  { id: 'humming', name: 'HUMMING', check: s => s.totalEarned >= 100 },
+  { id: 'resonant', name: 'RESONANT', check: s => s.totalEarned >= 1000 },
+  { id: 'overcharge', name: 'OVERCHARGE', check: s => s.totalEarned >= 10000 },
+  { id: 'surge', name: 'POWER SURGE', check: s => s.totalEarned >= 100000 },
+  { id: 'automated', name: 'AUTOMATED', check: s => s.lv.auto >= 1 },
+  { id: 'magnate', name: 'MAGNATE', check: s => (s.lv.click + s.lv.auto + s.lv.core) >= 10 },
+  { id: 'coil', name: 'FULL RESONANCE', check: s => s.lv.core >= 3 },
+];
+
+let S = { fragments: 0, totalEarned: 0, clicks: 0, lv: { click: 0, auto: 0, core: 0 }, ach: [] };
+
+function load() {
+  try {
+    const raw = localStorage.getItem('chargeArchive');
+    if (raw) { const d = JSON.parse(raw); S = Object.assign(S, d); S.lv = Object.assign({ click: 0, auto: 0, core: 0 }, d.lv || {}); }
+  } catch (e) {}
+}
+function save() {
+  try { localStorage.setItem('chargeArchive', JSON.stringify(S)); } catch (e) {}
+}
+function fmt(n) {
+  n = Math.floor(n);
+  if (n < 1000) return String(n);
+  const units = ['K', 'M', 'B', 'T'];
+  let u = -1;
+  do { n /= 1000; u++; } while (n >= 1000 && u < units.length - 1);
+  return n.toFixed(1) + units[u];
+}
+const mult = () => Math.pow(2, S.lv.core);
+const clickGain = () => (1 + S.lv.click) * mult();
+const autoRate = () => S.lv.auto * mult();
+const cost = (u) => Math.floor(u.base * Math.pow(u.growth, S.lv[u.id]));
+
+function checkAch() {
+  ACHIEVEMENTS.forEach(a => {
+    if (!S.ach.includes(a.id) && a.check(S)) {
+      S.ach.push(a.id);
+      toast.textContent = '🏆 ACHIEVEMENT UNLOCKED: ' + a.name;
+      setTimeout(() => { toast.textContent = ''; }, 2600);
+    }
+  });
+}
+
+function render() {
+  fragEl.textContent = fmt(S.fragments);
+  rateEl.textContent = '+' + fmt(clickGain()) + ' / CLICK · +' + fmt(autoRate()) + ' / SEC';
+  shopEl.innerHTML = '';
+  UPGRADES.forEach(u => {
+    const c = cost(u);
+    const div = document.createElement('div');
+    div.className = 'upgrade' + (S.fragments >= c ? '' : ' cant');
+    div.innerHTML = '<h4>' + u.name + ' <span class="lvl">LV ' + S.lv[u.id] + '</span></h4>' +
+      '<p>' + u.desc + '</p><div class="cost">◈ ' + fmt(c) + ' FRAGMENTS</div>';
+    div.addEventListener('click', () => buy(u));
+    shopEl.appendChild(div);
+  });
+  achEl.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'ach' + (S.ach.includes(a.id) ? ' won' : '');
+    div.textContent = a.name;
+    achEl.appendChild(div);
+  });
+}
+
+function buy(u) {
+  const c = cost(u);
+  if (S.fragments < c) return;
+  S.fragments -= c;
+  S.lv[u.id]++;
+  toast.textContent = u.name + ' → LV ' + S.lv[u.id];
+  setTimeout(() => { toast.textContent = ''; }, 1800);
+  checkAch(); render(); save();
+}
+
+function gain(n) {
+  S.fragments += n;
+  S.totalEarned += n;
+  checkAch(); render();
+}
+
+core.addEventListener('click', (e) => {
+  const g = clickGain();
+  S.clicks++;
+  gain(g);
+  core.classList.remove('pulsing');
+  void core.offsetWidth;
+  core.classList.add('pulsing');
+  const f = document.createElement('div');
+  f.className = 'float';
+  f.textContent = '+' + fmt(g);
+  const r = coreZone.getBoundingClientRect();
+  f.style.left = (e.clientX - r.left - 10) + 'px';
+  f.style.top = (e.clientY - r.top - 10) + 'px';
+  coreZone.appendChild(f);
+  setTimeout(() => f.remove(), 950);
+  save();
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Reset all Charge the Archive progress?')) {
+    S = { fragments: 0, totalEarned: 0, clicks: 0, lv: { click: 0, auto: 0, core: 0 }, ach: [] };
+    save(); render();
+    toast.textContent = 'ARCHIVE DISCHARGED. START AGAIN.';
+    setTimeout(() => { toast.textContent = ''; }, 2000);
+  }
+});
+
+setInterval(() => {
+  const r = autoRate();
+  if (r > 0) { S.fragments += r / 10; S.totalEarned += r / 10; checkAch(); render(); }
+}, 100);
+setInterval(save, 5000);
+window.addEventListener('beforeunload', save);
+document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+
+load(); render();
+</script>
 </body>
 </html>

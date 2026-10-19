@@ -4,7 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Signal Decode — NEORUIN™ OUTPOST</title>
+<meta name="description" content="A garbled transmission scrolls past. Type the cleartext before the timer dies.">
 <link rel="stylesheet" href="../styles.css">
+<style>
+  .game-wrap{max-width:760px;margin:0 auto;text-align:center}
+  .game-wrap h2{font-size:30px;letter-spacing:4px;color:var(--gold);font-weight:normal;margin:14px 0}
+  .game-wrap .lede{color:var(--dim);max-width:560px;margin:0 auto 8px;font-size:15px}
+  .hud{display:flex;justify-content:center;gap:44px;flex-wrap:wrap;margin:16px 0 4px}
+  .hud .stat{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:3px;color:var(--dim)}
+  .hud .stat b{display:block;font-size:28px;color:var(--gold);letter-spacing:2px;margin-top:4px;font-weight:normal}
+  #garble{font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:3px;color:rgba(160,154,140,.4);
+    min-height:22px;margin:10px 0;overflow:hidden;white-space:nowrap}
+  #phrase{font-family:ui-monospace,Menlo,monospace;font-size:clamp(20px,4vw,32px);letter-spacing:6px;
+    margin:22px auto;line-height:2;max-width:700px;word-break:break-all}
+  #phrase .done{color:var(--gold)}
+  #phrase .next{color:var(--cream);border-bottom:3px solid var(--gold)}
+  #phrase .todo{color:var(--dim)}
+  #phrase.bad{animation:shake .18s}
+  @keyframes shake{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
+  #timerbar{height:8px;background:#1a1712;border:1px solid var(--line);margin:18px auto;max-width:560px}
+  #timerfill{height:100%;background:var(--gold);width:100%;transition:width .1s linear}
+  #msg{min-height:30px;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:2px;color:var(--cream);margin:12px 0}
+  #strikes{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:3px;color:var(--dim);margin-top:8px}
+  #strikes .hit{color:var(--red)}
+  .keys{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:16px}
+</style>
 </head>
 <body>
 <header class="site">
@@ -17,16 +41,153 @@
   </div>
 </header>
 <div class="wrap">
-<section class="block center">
-  <span class="status soon">COMING SOON</span>
-  <h2 style="font-size:30px;letter-spacing:4px;color:var(--gold);font-weight:normal;margin:14px 0">Signal Decode</h2>
-  <p style="color:var(--dim);max-width:520px;margin:0 auto 28px">A garbled transmission scrolls past. Type the cleartext before the timer dies.</p>
-  <p class="mono" style="font-size:11px;letter-spacing:2px;color:var(--dim)">THIS EXPERIMENT IS STILL CALIBRATING.<br>CHECK THE TRANSMISSIONS FEED FOR LAUNCH NEWS.</p>
-  <div class="mt"><a class="btn" href="../index.html#apps">BACK TO APPS</a></div>
+<section class="block">
+  <div class="game-wrap">
+    <span class="status online">ONLINE</span>
+    <h2>SIGNAL DECODE</h2>
+    <p class="lede">A garbled transmission scrolls past. Type the cleartext exactly — before the timer dies. Three strikes and the signal is lost.</p>
+    <div class="hud">
+      <div class="stat">DECODED<b id="score">0</b></div>
+      <div class="stat">STREAK<b id="streak">0</b></div>
+      <div class="stat">BEST<b id="best">0</b></div>
+    </div>
+    <div id="garble"></div>
+    <div id="phrase"></div>
+    <div id="timerbar"><div id="timerfill"></div></div>
+    <div id="msg">PRESS START TO INTERCEPT A TRANSMISSION.</div>
+    <div id="strikes"></div>
+    <div><button class="btn solid" id="startBtn">START</button></div>
+    <div class="keys">TYPE THE CLEARTEXT — NO CLICKING NEEDED</div>
+    <div class="mt"><a class="btn" href="../index.html#apps">BACK TO APPS</a></div>
+  </div>
 </section>
 </div>
 <footer class="site">
   <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
 </footer>
+<script>
+const phraseEl = document.getElementById('phrase');
+const garbleEl = document.getElementById('garble');
+const timerFill = document.getElementById('timerfill');
+const msg = document.getElementById('msg');
+const strikesEl = document.getElementById('strikes');
+const scoreEl = document.getElementById('score');
+const streakEl = document.getElementById('streak');
+const bestEl = document.getElementById('best');
+const startBtn = document.getElementById('startBtn');
+
+const PHRASES = [
+  'OPEN THE ARCHIVE', 'SIGNAL ACQUIRED', 'OBSERVER PRESENT', 'RELIC SECURED',
+  'VAULT SEALED', 'TRANSMISSION ENDS', 'FREQUENCY LOCKED', 'DECODE IN PROGRESS',
+  'THE ARCHIVE REMEMBERS', 'CALIBRATION COMPLETE', 'ALL TUMBLERS ALIGNED',
+  'THE OUTPOST IS LISTENING', 'FRAGMENTS RECOVERED INTACT', 'NO FURTHER INSTRUCTIONS'
+];
+const GLYPHS = 'ΞΦΨΩΔΣ01#%/?!<>+*';
+
+let round = 1, score = 0, streak = 0, pos = 0, strikes = 0;
+let phrase = '', timeLeft = 0, timeMax = 1, state = 'idle', lastTick = 0;
+let best = parseInt(localStorage.getItem('signalBest') || '0', 10) || 0;
+bestEl.textContent = best;
+
+function pickPhrase() {
+  const tier = Math.min(Math.floor((round - 1) / 3), 2);
+  const pool = PHRASES.filter(p =>
+    tier === 0 ? p.length <= 14 : tier === 1 ? (p.length > 14 && p.length <= 20) : p.length > 20);
+  return pool[Math.floor(Math.random() * pool.length)] || PHRASES[0];
+}
+
+function setupRound() {
+  phrase = pickPhrase();
+  pos = 0; strikes = 0;
+  timeMax = Math.max(20 - (round - 1) * 1.2, 8);
+  timeLeft = timeMax;
+  state = 'playing';
+  lastTick = performance.now();
+  msg.textContent = 'ROUND ' + round + ' — DECODE THE TRANSMISSION.';
+  render();
+  startBtn.textContent = 'RESTART';
+}
+
+function render() {
+  let html = '';
+  for (let i = 0; i < phrase.length; i++) {
+    const ch = phrase[i] === ' ' ? '&nbsp;' : phrase[i];
+    if (i < pos) html += '<span class="done">' + ch + '</span>';
+    else if (i === pos) html += '<span class="next">' + ch + '</span>';
+    else html += '<span class="todo">' + ch + '</span>';
+  }
+  phraseEl.innerHTML = html;
+  strikesEl.innerHTML = 'STRIKES ' + [0, 1, 2].map(i =>
+    '<span class="' + (i < strikes ? 'hit' : '') + '">●</span>').join(' ');
+}
+
+function garbleTick() {
+  if (state !== 'playing') { garbleEl.textContent = ''; return; }
+  let s = '';
+  for (let i = 0; i < 48; i++) s += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+  garbleEl.textContent = s;
+}
+
+function finishFail(reason) {
+  state = 'done';
+  streak = 0; streakEl.textContent = '0';
+  msg.textContent = reason + ' — SIGNAL LOST. RECALIBRATING…';
+  setTimeout(setupRound, 1900);
+}
+
+function finishWin() {
+  state = 'done';
+  score++; scoreEl.textContent = score;
+  streak++; streakEl.textContent = streak;
+  if (streak > best) {
+    best = streak; bestEl.textContent = best;
+    try { localStorage.setItem('signalBest', String(best)); } catch (e) {}
+  }
+  msg.textContent = 'TRANSMISSION DECODED — NEXT SIGNAL INCOMING.';
+  setTimeout(() => { round++; setupRound(); }, 1500);
+}
+
+function loop(now) {
+  if (state === 'playing') {
+    const dt = (now - lastTick) / 1000;
+    lastTick = now;
+    timeLeft -= dt;
+    timerFill.style.width = Math.max(0, (timeLeft / timeMax) * 100) + '%';
+    timerFill.style.background = timeLeft < timeMax * 0.25 ? 'var(--red)' : 'var(--gold)';
+    if (timeLeft <= 0) finishFail('TIME EXPIRED');
+  }
+  requestAnimationFrame(loop);
+}
+
+document.addEventListener('keydown', (e) => {
+  if (state !== 'playing') return;
+  if (e.key.length !== 1 && e.key !== ' ') return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const expected = phrase[pos];
+  const typed = e.key.toUpperCase();
+  if (typed === expected) {
+    pos++;
+    if (pos >= phrase.length) finishWin();
+    else render();
+  } else {
+    strikes++;
+    phraseEl.classList.remove('bad');
+    void phraseEl.offsetWidth;
+    phraseEl.classList.add('bad');
+    if (strikes >= 3) finishFail('TOO MANY STRIKES');
+    else { msg.textContent = 'WRONG CHARACTER — ' + (3 - strikes) + ' STRIKE(S) LEFT.'; render(); }
+  }
+});
+
+startBtn.addEventListener('click', () => {
+  round = 1; score = 0; streak = 0;
+  scoreEl.textContent = '0'; streakEl.textContent = '0';
+  setupRound();
+});
+
+setInterval(garbleTick, 120);
+requestAnimationFrame(loop);
+render();
+</script>
 </body>
 </html>

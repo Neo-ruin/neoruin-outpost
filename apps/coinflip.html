@@ -4,7 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Archive Coinflip — NEORUIN™ OUTPOST</title>
+<meta name="description" content="A ceremonial heads-or-tails decision tool, archive style.">
 <link rel="stylesheet" href="../styles.css">
+<style>
+  .game-wrap{max-width:640px;margin:0 auto;text-align:center}
+  .game-wrap h2{font-size:30px;letter-spacing:4px;color:var(--gold);font-weight:normal;margin:14px 0}
+  .game-wrap .lede{color:var(--dim);max-width:520px;margin:0 auto 8px;font-size:15px}
+  .coin-stage{perspective:900px;margin:34px auto 10px;width:200px;height:200px}
+  #coin{width:200px;height:200px;border-radius:50%;position:relative;transform-style:preserve-3d;
+    border:3px solid var(--gold);
+    background:radial-gradient(circle at 35% 30%, #2a2415 0%, #14110a 55%, #0b0a08 100%);
+    box-shadow:0 0 34px rgba(201,162,39,.22), inset 0 0 24px rgba(201,162,39,.12);
+    display:flex;align-items:center;justify-content:center}
+  #coin .face{font-family:ui-monospace,Menlo,monospace;font-size:22px;letter-spacing:6px;color:var(--gold);text-align:center;line-height:1.5;padding:0 18px}
+  #coin .face small{display:block;font-size:9px;letter-spacing:3px;color:var(--dim);margin-top:6px}
+  #coin.flipping{animation:coinspin .12s linear infinite}
+  @keyframes coinspin{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}
+  #proclaim{min-height:34px;font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:3px;color:var(--cream);margin:18px 0 6px}
+  .hud{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;margin:14px 0}
+  .hud .stat{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:3px;color:var(--dim)}
+  .hud .stat b{display:block;font-size:26px;color:var(--gold);letter-spacing:2px;margin-top:4px;font-weight:normal}
+  #history{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:14px auto;max-width:420px;min-height:30px}
+  .chip{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:1px;width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
+  .chip.h{color:#000;background:var(--gold);border-color:var(--gold);font-weight:700}
+  .chip.t{color:var(--dim);background:transparent}
+  .keys{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:16px}
+</style>
 </head>
 <body>
 <header class="site">
@@ -17,16 +43,90 @@
   </div>
 </header>
 <div class="wrap">
-<section class="block center">
-  <span class="status soon">COMING SOON</span>
-  <h2 style="font-size:30px;letter-spacing:4px;color:var(--gold);font-weight:normal;margin:14px 0">Archive Coinflip</h2>
-  <p style="color:var(--dim);max-width:520px;margin:0 auto 28px">A ceremonial heads-or-tails decision tool, archive style.</p>
-  <p class="mono" style="font-size:11px;letter-spacing:2px;color:var(--dim)">THIS EXPERIMENT IS STILL CALIBRATING.<br>CHECK THE TRANSMISSIONS FEED FOR LAUNCH NEWS.</p>
-  <div class="mt"><a class="btn" href="../index.html#apps">BACK TO APPS</a></div>
+<section class="block">
+  <div class="game-wrap">
+    <span class="status online">ONLINE</span>
+    <h2>ARCHIVE COINFLIP</h2>
+    <p class="lede">A ceremonial heads-or-tails decision tool. Pose your question, consult the archive, accept the verdict.</p>
+    <div class="coin-stage"><div id="coin"><div class="face" id="coinFace">?<small>AWAITING<br>CONSULTATION</small></div></div></div>
+    <div id="proclaim">THE ARCHIVE AWAITS YOUR QUESTION.</div>
+    <div><button class="btn solid" id="flipBtn">CONSULT THE ARCHIVE</button></div>
+    <div class="hud">
+      <div class="stat">HEADS<b id="headsCount">0</b></div>
+      <div class="stat">TAILS<b id="tailsCount">0</b></div>
+      <div class="stat">STREAK<b id="streak">0</b></div>
+    </div>
+    <div id="history"></div>
+    <div class="keys">PRESS SPACE TO FLIP</div>
+    <div class="mt"><a class="btn" href="../index.html#apps">BACK TO APPS</a></div>
+  </div>
 </section>
 </div>
 <footer class="site">
   <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
 </footer>
+<script>
+const coin = document.getElementById('coin');
+const coinFace = document.getElementById('coinFace');
+const proclaim = document.getElementById('proclaim');
+const flipBtn = document.getElementById('flipBtn');
+const headsEl = document.getElementById('headsCount');
+const tailsEl = document.getElementById('tailsCount');
+const streakEl = document.getElementById('streak');
+const historyEl = document.getElementById('history');
+
+let heads = 0, tails = 0, streak = 0, lastSide = null, flipping = false;
+const history = [];
+
+const VERDICTS = {
+  H: ['THE ARCHIVE HAS SPOKEN: HEADS.', 'HEADS — FORTUNE FAVORS THE BOLD.', 'HEADS. THE ARCHIVE NODS.', 'HEADS — PROCEED WITHOUT HESITATION.'],
+  T: ['THE ARCHIVE HAS SPOKEN: TAILS.', 'TAILS — PATIENCE, OBSERVER.', 'TAILS. THE ARCHIVE SHAKES ITS HEAD.', 'TAILS — NOT THIS TIME.']
+};
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+function render() {
+  headsEl.textContent = heads;
+  tailsEl.textContent = tails;
+  streakEl.textContent = streak;
+  historyEl.innerHTML = history.slice(-14).map(s =>
+    '<span class="chip ' + s.toLowerCase() + '">' + s + '</span>').join('');
+}
+
+function flip() {
+  if (flipping) return;
+  flipping = true;
+  flipBtn.disabled = true;
+  proclaim.textContent = 'CONSULTING…';
+  coin.classList.add('flipping');
+  let ticks = 0;
+  const flicker = setInterval(() => {
+    const side = Math.random() < 0.5 ? 'H' : 'T';
+    coinFace.innerHTML = (side === 'H' ? 'HEADS' : 'TAILS') + '<small>ARCHIVE<br>DELIBERATING</small>';
+    if (++ticks > 14) {
+      clearInterval(flicker);
+      const result = Math.random() < 0.5 ? 'H' : 'T';
+      coin.classList.remove('flipping');
+      coinFace.innerHTML = (result === 'H' ? 'HEADS' : 'TAILS') + '<small>VERDICT<br>RENDERED</small>';
+      if (result === 'H') heads++; else tails++;
+      streak = (result === lastSide) ? streak + 1 : 1;
+      lastSide = result;
+      history.push(result);
+      proclaim.textContent = pick(VERDICTS[result]);
+      render();
+      flipping = false;
+      flipBtn.disabled = false;
+    }
+  }, 70);
+}
+
+flipBtn.addEventListener('click', flip);
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+    e.preventDefault();
+    flip();
+  }
+});
+render();
+</script>
 </body>
 </html>
