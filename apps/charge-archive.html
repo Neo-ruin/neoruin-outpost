@@ -139,18 +139,48 @@ function checkAch() {
 }
 
 function render() {
+  renderCounts();
+  renderShop();
+  renderAch();
+}
+
+function renderCounts() {
   fragEl.textContent = fmt(S.fragments);
   rateEl.textContent = '+' + fmt(clickGain()) + ' / CLICK · +' + fmt(autoRate()) + ' / SEC';
+}
+
+let lastShopSig = '';
+function shopSig() {
+  return UPGRADES.map(u => S.lv[u.id] + ':' + (S.fragments >= cost(u) ? 1 : 0)).join('|');
+}
+function renderShop() {
+  const sig = shopSig();
+  if (sig === lastShopSig) return;
+  lastShopSig = sig;
   shopEl.innerHTML = '';
   UPGRADES.forEach(u => {
     const c = cost(u);
     const div = document.createElement('div');
     div.className = 'upgrade' + (S.fragments >= c ? '' : ' cant');
+    div.dataset.id = u.id;
     div.innerHTML = '<h4>' + u.name + ' <span class="lvl">LV ' + S.lv[u.id] + '</span></h4>' +
       '<p>' + u.desc + '</p><div class="cost">◈ ' + fmt(c) + ' FRAGMENTS</div>';
-    div.addEventListener('click', () => buy(u));
     shopEl.appendChild(div);
   });
+}
+// Single delegated listener: clicks survive shop re-renders.
+shopEl.addEventListener('click', (e) => {
+  const div = e.target.closest('.upgrade');
+  if (!div || div.classList.contains('cant')) return;
+  const u = UPGRADES.find(x => x.id === div.dataset.id);
+  if (u) buy(u);
+});
+
+let lastAchSig = '';
+function renderAch() {
+  const sig = S.ach.slice().sort().join(',');
+  if (sig === lastAchSig) return;
+  lastAchSig = sig;
   achEl.innerHTML = '';
   ACHIEVEMENTS.forEach(a => {
     const div = document.createElement('div');
