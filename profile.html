@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — NEORUIN™ OUTPOST</title>
+<meta name="description" content="A member profile of the NEORUIN outpost.">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="community.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="index.html">NEORUIN™<small>OUTPOST</small></a>
+    <nav class="main">
+      <a href="community.html">← COMMUNITY</a>
+      <a href="https://neoruins.com" target="_blank" rel="noopener">THE ARCHIVE ↗</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<section class="block" id="profileWrap" style="display:none">
+  <div class="panel" style="padding:0;overflow:hidden">
+    <div class="banner" id="pBanner"></div>
+    <div class="p-head">
+      <canvas class="avatar" id="pAvatar" width="224" height="224"></canvas>
+      <div class="p-name" id="pName">—</div>
+      <div class="p-meta">
+        <span class="chip-codename" id="pCode">—</span>
+        <span class="chip-clearance" id="pClear">—</span>
+      </div>
+      <p class="p-bio" id="pBio"></p>
+      <div class="mt" id="ownActions" style="display:none">
+        <a class="btn solid" href="profile-edit.html">EDIT PROFILE</a>
+      </div>
+    </div>
+    <div style="height:28px"></div>
+  </div>
+</section>
+
+<section class="block" id="missingWrap" style="display:none">
+  <div class="panel center">
+    <span class="status soon">NOT FOUND</span>
+    <h3>No Profile Here</h3>
+    <p>This observer has not claimed a corner of the commons yet.</p>
+    <p><a class="btn" href="community.html">BACK TO COMMUNITY</a></p>
+  </div>
+</section>
+</div>
+
+<footer class="site">
+  <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+<script src="community.js"></script>
+<script>
+async function boot() {
+  await ObserverAuth.init();
+  const q = new URLSearchParams(location.search);
+  let userId = q.get('u');
+  let card = null;
+
+  if (!userId && q.get('c')) card = await Community.cardByCodename(q.get('c'));
+  if (card) userId = card.user_id;
+  if (!userId) { document.getElementById('missingWrap').style.display = 'block'; return; }
+
+  const [prof, c] = await Promise.all([
+    Community.profileById(userId),
+    card || Community.card(userId),
+  ]);
+  if (!prof) { document.getElementById('missingWrap').style.display = 'block'; return; }
+
+  const codename = (c && c.codename) || 'OBSERVER';
+  const name = prof.display_name || codename;
+  document.getElementById('profileWrap').style.display = 'block';
+  document.getElementById('pBanner').className = 'banner banner-' + (prof.banner_style || 'gold');
+  document.getElementById('pName').textContent = name;
+  document.getElementById('pCode').textContent = codename;
+  document.getElementById('pClear').textContent = (c && c.clearance) || 'OBSERVER';
+  document.getElementById('pBio').textContent = prof.bio || '';
+  document.title = name + ' — NEORUIN™ OUTPOST';
+  renderAvatar(document.getElementById('pAvatar'), {
+    style: prof.avatar_style, bg: prof.avatar_bg, label: name,
+  });
+  if (ObserverAuth.user && ObserverAuth.user.id === userId) {
+    document.getElementById('ownActions').style.display = 'block';
+  }
+}
+boot();
+</script>
+</body>
+</html>

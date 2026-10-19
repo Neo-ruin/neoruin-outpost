@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community — NEORUIN™ OUTPOST</title>
+<meta name="description" content="Member profiles of the NEORUIN outpost. Create yours, browse the commons.">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="community.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="index.html">NEORUIN™<small>OUTPOST</small></a>
+    <nav class="main">
+      <a href="index.html">← OUTPOST</a>
+      <a href="https://neoruins.com" target="_blank" rel="noopener">THE ARCHIVE ↗</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" style="padding:52px 20px 40px">
+  <div class="kicker mono">THE COMMONS • MEMBER PROFILES</div>
+  <h1>COMMUNITY</h1>
+  <p class="tag">The people of the outpost. Claim your corner — no Discord required.</p>
+</section>
+
+<div class="wrap">
+<section class="block" id="meSection" style="display:none">
+  <div class="sec-head"><h2>YOUR PROFILE</h2><span class="hint mono">VISIBLE TO ALL MEMBERS</span></div>
+  <div class="panel">
+    <div class="p-head" style="padding:0">
+      <canvas class="avatar" id="meAvatar" width="224" height="224"></canvas>
+      <div class="p-name" id="meName">—</div>
+      <div class="p-meta"><span class="chip-codename" id="meCode">—</span><span class="chip-clearance" id="meClear">—</span></div>
+      <p class="p-bio" id="meBio"></p>
+      <div class="mt" style="display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn" id="meView" href="#">VIEW PUBLIC PAGE</a>
+        <a class="btn solid" href="profile-edit.html">EDIT PROFILE</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="joinSection" style="display:none">
+  <div class="panel center">
+    <span class="status online">OPEN</span>
+    <h3>Claim Your Corner</h3>
+    <p>Sign in with your observer account, design your profile, join the commons.</p>
+    <p><button class="btn solid" id="joinBtn">SIGN IN / CREATE PROFILE</button></p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-head"><h2>MEMBERS</h2><span class="hint mono" id="memberCount"></span></div>
+  <div class="member-grid" id="directory"></div>
+  <p class="mono" id="dirEmpty" style="display:none;font-size:11px;letter-spacing:2px;color:var(--dim)">NO PROFILES YET — BE THE FIRST.</p>
+</section>
+</div>
+
+<footer class="site">
+  <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+<script src="community.js"></script>
+<script>
+async function boot() {
+  await ObserverAuth.init();
+
+  // Directory (public)
+  const profiles = await Community.directory(48);
+  const dir = document.getElementById('directory');
+  document.getElementById('memberCount').textContent = profiles.length + ' MEMBER' + (profiles.length === 1 ? '' : 'S');
+  if (!profiles.length) document.getElementById('dirEmpty').style.display = 'block';
+  const cards = await Promise.all(profiles.map(p => Community.card(p.user_id)));
+  const cardById = {};
+  cards.forEach(c => { if (c) cardById[c.user_id] = c; });
+  dir.innerHTML = profiles.map(p => {
+    const c = cardById[p.user_id] || {};
+    const name = esc(p.display_name || c.codename || 'OBSERVER');
+    return '<a class="member" href="profile.html?u=' + encodeURIComponent(p.user_id) + '">' +
+      '<canvas width="144" height="144" data-avatar data-style="' + esc(p.avatar_style) + '" data-bg="' + esc(p.avatar_bg) + '" data-label="' + esc(p.display_name || c.codename || '') + '"></canvas>' +
+      '<div class="m-name">' + name + '</div>' +
+      '<div class="m-code">' + esc(c.codename || '') + (c.clearance ? ' · ' + esc(c.clearance) : '') + '</div>' +
+      '<div class="m-bio">' + esc(p.bio || '') + '</div></a>';
+  }).join('');
+  dir.querySelectorAll('canvas[data-avatar]').forEach(cv => {
+    renderAvatar(cv, { style: cv.dataset.style, bg: cv.dataset.bg, label: cv.dataset.label });
+  });
+
+  // Me section
+  if (ObserverAuth.user) {
+    const [prof, mine] = await Promise.all([ObserverAuth.profile || ObserverAuth.loadProfile(), Community.myProfile()]);
+    const code = (prof && prof.codename) || 'OBSERVER';
+    const name = (mine && mine.display_name) || code;
+    document.getElementById('meSection').style.display = 'block';
+    document.getElementById('meName').textContent = name;
+    document.getElementById('meCode').textContent = code;
+    document.getElementById('meClear').textContent = (prof && prof.clearance) || 'OBSERVER';
+    document.getElementById('meBio').textContent = (mine && mine.bio) || 'No bio yet — tell the commons who you are.';
+    document.getElementById('meView').href = 'profile.html?u=' + encodeURIComponent(ObserverAuth.user.id);
+    renderAvatar(document.getElementById('meAvatar'), {
+      style: (mine && mine.avatar_style) || 'diamond',
+      bg: (mine && mine.avatar_bg) || 'void',
+      label: name,
+    });
+    if (!mine) {
+      document.getElementById('meView').style.display = 'none';
+      document.getElementById('meBio').textContent = 'You have not created a profile yet.';
+    }
+  } else {
+    document.getElementById('joinSection').style.display = 'block';
+    document.getElementById('joinBtn').addEventListener('click', () => {
+      if (window.ObserverModal) window.ObserverModal.open();
+    });
+  }
+}
+document.addEventListener('observer-auth-change', () => location.reload());
+boot();
+</script>
+</body>
+</html>

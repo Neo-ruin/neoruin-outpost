@@ -1,0 +1,43 @@
+/* NEORUINS Outpost — Community shared styles */
+
+/* banners */
+.banner{height:120px;border:1px solid var(--line);margin-bottom:-56px;position:relative;overflow:hidden}
+.banner-gold{background:linear-gradient(120deg,#241a06 0%,#4a3510 45%,#241a06 100%)}
+.banner-ember{background:linear-gradient(120deg,#1c0d04 0%,#5a2410 50%,#1c0d04 100%)}
+.banner-dusk{background:linear-gradient(120deg,#0a0c1c 0%,#232a5a 50%,#0a0c1c 100%)}
+.banner-signal{background:linear-gradient(120deg,#06140c 0%,#145a30 50%,#06140c 100%)}
+.banner::after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(115deg,transparent 0 14px,rgba(201,162,39,.05) 14px 15px)}
+
+/* profile header */
+.p-head{position:relative;padding:0 28px 8px}
+.p-head canvas.avatar{width:112px;height:112px;border:2px solid var(--gold);border-radius:8px;background:#0b0a08;display:block}
+.p-name{font-size:26px;letter-spacing:3px;color:var(--cream);font-weight:normal;margin:14px 0 6px}
+.p-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.chip-codename{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;color:var(--gold);border:1px solid var(--gold);padding:5px 12px}
+.chip-clearance{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;color:var(--green);border:1px solid var(--green);padding:5px 12px}
+.p-bio{color:var(--dim);font-size:15px;max-width:640px;white-space:pre-wrap}
+
+/* directory */
+.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.member{display:block;border:1px solid var(--line);background:var(--panel);padding:18px;text-decoration:none;transition:border-color .15s}
+.member:hover{border-color:var(--gold)}
+.member canvas{width:72px;height:72px;border:1px solid var(--line);border-radius:6px;display:block;margin-bottom:12px}
+.member .m-name{color:var(--cream);font-size:15px;letter-spacing:2px;margin-bottom:4px}
+.member .m-code{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+.member .m-bio{font-size:12px;color:var(--dim);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* editor */
+.edit-grid{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start}
+@media(max-width:760px){.edit-grid{grid-template-columns:1fr}}
+.preview-pane{position:sticky;top:90px;text-align:center}
+.preview-pane canvas{width:100%;max-width:260px;height:auto;border:2px solid var(--gold);border-radius:8px}
+.opt-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 20px}
+.opt{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;padding:10px 14px;
+  border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
+.opt.sel{border-color:var(--gold);color:var(--gold);background:rgba(201,162,39,.08)}
+textarea.bio{width:100%;background:#0e0d0b;border:1px solid var(--line);color:var(--cream);
+  font-family:Georgia,serif;font-size:15px;padding:14px;outline:none;min-height:96px;resize:vertical}
+textarea.bio:focus{border-color:var(--gold)}
+.char-count{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:2px;color:var(--dim);text-align:right;margin-top:4px}
+#saveMsg{min-height:24px;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:2px;margin-top:10px}

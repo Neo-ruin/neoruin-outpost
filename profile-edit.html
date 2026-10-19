@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Profile — NEORUIN™ OUTPOST</title>
+<meta name="description" content="Design your outpost profile.">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="community.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="index.html">NEORUIN™<small>OUTPOST</small></a>
+    <nav class="main">
+      <a href="community.html">← COMMUNITY</a>
+      <a href="https://neoruins.com" target="_blank" rel="noopener">THE ARCHIVE ↗</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+<section class="block" id="gate" style="display:none">
+  <div class="panel center">
+    <span class="status soon">SIGN IN REQUIRED</span>
+    <h3>Observers Only</h3>
+    <p>Sign in to design your profile.</p>
+    <p><button class="btn solid" id="gateBtn">SIGN IN</button></p>
+  </div>
+</section>
+
+<section class="block" id="editor" style="display:none">
+  <div class="sec-head"><h2>DESIGN YOUR PROFILE</h2><span class="hint mono">LIVE PREVIEW</span></div>
+  <div class="edit-grid">
+    <div class="preview-pane">
+      <div class="banner banner-gold" id="prevBanner" style="height:70px;margin-bottom:-40px"></div>
+      <canvas id="prevAvatar" width="320" height="320" style="position:relative"></canvas>
+      <div class="p-name" id="prevName" style="font-size:20px">—</div>
+      <div class="p-meta" style="justify-content:center"><span class="chip-codename" id="prevCode">—</span></div>
+    </div>
+    <div>
+      <div class="field">
+        <label>DISPLAY NAME</label>
+        <input type="text" id="fName" maxlength="30" placeholder="Defaults to your codename">
+      </div>
+      <div class="field">
+        <label>BIO — 280 CHARACTERS</label>
+        <textarea class="bio" id="fBio" maxlength="280" placeholder="Who are you, observer?"></textarea>
+        <div class="char-count"><span id="bioCount">0</span>/280</div>
+      </div>
+      <div class="field">
+        <label>AVATAR SEAL</label>
+        <div class="opt-row" id="sealRow">
+          <button class="opt" data-v="diamond">DIAMOND</button>
+          <button class="opt" data-v="rings">RINGS</button>
+          <button class="opt" data-v="bars">BARS</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>AVATAR BACKGROUND</label>
+        <div class="opt-row" id="bgRow">
+          <button class="opt" data-v="void">VOID</button>
+          <button class="opt" data-v="ember">EMBER</button>
+          <button class="opt" data-v="dusk">DUSK</button>
+          <button class="opt" data-v="ash">ASH</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>BANNER</label>
+        <div class="opt-row" id="bannerRow">
+          <button class="opt" data-v="gold">GOLD</button>
+          <button class="opt" data-v="ember">EMBER</button>
+          <button class="opt" data-v="dusk">DUSK</button>
+          <button class="opt" data-v="signal">SIGNAL</button>
+        </div>
+      </div>
+      <div><button class="btn solid" id="saveBtn">SAVE PROFILE</button></div>
+      <div id="saveMsg"></div>
+      <div class="mt"><a class="btn" id="viewLink" href="community.html">BACK</a></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<footer class="site">
+  <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+<script src="community.js"></script>
+<script>
+const state = { display_name: '', bio: '', avatar_style: 'diamond', avatar_bg: 'void', banner_style: 'gold' };
+let codename = 'OBSERVER';
+
+function paint() {
+  renderAvatar(document.getElementById('prevAvatar'), {
+    style: state.avatar_style, bg: state.avatar_bg,
+    label: state.display_name || codename,
+  });
+  document.getElementById('prevName').textContent = state.display_name || codename;
+  document.getElementById('prevBanner').className = 'banner banner-' + state.banner_style;
+  document.getElementById('bioCount').textContent = state.bio.length;
+}
+
+function optRow(id, key) {
+  const row = document.getElementById(id);
+  row.querySelectorAll('.opt').forEach(b => {
+    if (b.dataset.v === state[key]) b.classList.add('sel');
+    b.addEventListener('click', () => {
+      state[key] = b.dataset.v;
+      row.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+      b.classList.add('sel');
+      paint();
+    });
+  });
+}
+
+async function boot() {
+  await ObserverAuth.init();
+  if (!ObserverAuth.user) {
+    document.getElementById('gate').style.display = 'block';
+    document.getElementById('gateBtn').addEventListener('click', () => {
+      if (window.ObserverModal) window.ObserverModal.open();
+    });
+    return;
+  }
+  document.getElementById('editor').style.display = 'block';
+  const prof = await ObserverAuth.loadProfile();
+  codename = (prof && prof.codename) || 'OBSERVER';
+  document.getElementById('prevCode').textContent = codename;
+
+  const mine = await Community.myProfile();
+  if (mine) {
+    state.display_name = mine.display_name || '';
+    state.bio = mine.bio || '';
+    state.avatar_style = mine.avatar_style || 'diamond';
+    state.avatar_bg = mine.avatar_bg || 'void';
+    state.banner_style = mine.banner_style || 'gold';
+    document.getElementById('fName').value = state.display_name;
+    document.getElementById('fBio').value = state.bio;
+  } else if (prof && prof.codename) {
+    state.display_name = prof.codename;
+    document.getElementById('fName').value = state.display_name;
+  }
+
+  document.getElementById('fName').addEventListener('input', e => {
+    state.display_name = e.target.value.slice(0, 30); paint();
+  });
+  document.getElementById('fBio').addEventListener('input', e => {
+    state.bio = e.target.value.slice(0, 280); paint();
+  });
+  optRow('sealRow', 'avatar_style');
+  optRow('bgRow', 'avatar_bg');
+  optRow('bannerRow', 'banner_style');
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveBtn');
+    const msgEl = document.getElementById('saveMsg');
+    btn.disabled = true; btn.textContent = 'SAVING…';
+    const { error } = await Community.saveProfile(state);
+    btn.disabled = false; btn.textContent = 'SAVE PROFILE';
+    if (error) {
+      msgEl.textContent = 'SAVE FAILED: ' + (error.message || error);
+      msgEl.style.color = 'var(--red)';
+    } else {
+      msgEl.textContent = 'PROFILE LIVE IN THE COMMONS.';
+      msgEl.style.color = 'var(--gold)';
+      document.getElementById('viewLink').textContent = 'VIEW YOUR PROFILE';
+      document.getElementById('viewLink').href = 'profile.html?u=' + encodeURIComponent(ObserverAuth.user.id);
+    }
+  });
+
+  document.getElementById('viewLink').href = 'profile.html?u=' + encodeURIComponent(ObserverAuth.user.id);
+  paint();
+}
+document.addEventListener('observer-auth-change', () => location.reload());
+boot();
+</script>
+</body>
+</html>
