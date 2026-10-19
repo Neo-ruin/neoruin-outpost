@@ -20,6 +20,13 @@
 </header>
 
 <div class="wrap">
+<section class="block" id="loadingWrap">
+  <div class="panel center">
+    <span class="status soon">RETRIEVING…</span>
+    <h3>Retrieving observer record…</h3>
+  </div>
+</section>
+
 <section class="block" id="profileWrap" style="display:none">
   <div class="panel" style="padding:0;overflow:hidden">
     <div class="banner" id="pBanner"></div>
@@ -50,13 +57,19 @@
 </div>
 
 <footer class="site">
-  <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.</div></div>
+  <div class="wrap"><div class="fine">NEORUIN™ OUTPOST — A CREATOR PORTAL, NOT CANON LORE<br>© 2026 Angelo Padula. All rights reserved.<br><a href="https://neoruins.com/privacy.html">PRIVACY</a> · <a href="https://neoruins.com/terms.html">TERMS</a></div></div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js"></script>
 <script src="community.js"></script>
 <script>
+function showWrap(id){
+  ['loadingWrap','profileWrap','missingWrap'].forEach(w=>{
+    const el = document.getElementById(w);
+    if(el) el.style.display = (w===id) ? 'block' : 'none';
+  });
+}
 async function boot() {
   await ObserverAuth.init();
   const q = new URLSearchParams(location.search);
@@ -65,17 +78,17 @@ async function boot() {
 
   if (!userId && q.get('c')) card = await Community.cardByCodename(q.get('c'));
   if (card) userId = card.user_id;
-  if (!userId) { document.getElementById('missingWrap').style.display = 'block'; return; }
+  if (!userId) { showWrap('missingWrap'); return; }
 
   const [prof, c] = await Promise.all([
     Community.profileById(userId),
     card || Community.card(userId),
   ]);
-  if (!prof) { document.getElementById('missingWrap').style.display = 'block'; return; }
+  if (!prof) { showWrap('missingWrap'); return; }
 
   const codename = (c && c.codename) || 'OBSERVER';
   const name = prof.display_name || codename;
-  document.getElementById('profileWrap').style.display = 'block';
+  showWrap('profileWrap');
   document.getElementById('pBanner').className = 'banner banner-' + (prof.banner_style || 'gold');
   document.getElementById('pName').textContent = name;
   document.getElementById('pCode').textContent = codename;
@@ -89,6 +102,13 @@ async function boot() {
     document.getElementById('ownActions').style.display = 'block';
   }
 }
+setTimeout(()=>{
+  const l = document.getElementById('loadingWrap');
+  if(l && l.style.display !== 'none'){
+    const h = l.querySelector('h3');
+    if(h) h.textContent = 'Still retrieving \u2014 the archive may be slow. Check your connection\u2026';
+  }
+}, 9000);
 boot();
 </script>
 </body>
