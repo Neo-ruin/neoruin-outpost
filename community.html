@@ -117,7 +117,14 @@ async function boot() {
     });
   }
 }
-document.addEventListener('observer-auth-change', () => location.reload());
+/* Reload only on genuine sign-in/out transitions. The auth library fires an
+   initial state event on every page load — reloading on that would loop forever. */
+let _authSettled = false, _wasAuthed = false;
+document.addEventListener('observer-auth-change', (e) => {
+  const authed = !!(e.detail && e.detail.user);
+  if (!_authSettled) { _authSettled = true; _wasAuthed = authed; return; }
+  if (authed !== _wasAuthed) location.reload();
+});
 boot();
 </script>
 </body>
