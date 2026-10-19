@@ -103,6 +103,7 @@ function setupRound() {
   timeLeft = timeMax;
   state = 'playing';
   lastTick = performance.now();
+  startBtn.blur(); // drop button focus so spacebar can't re-trigger START
   msg.textContent = 'ROUND ' + round + ' — DECODE THE TRANSMISSION.';
   render();
   startBtn.textContent = 'RESTART';
@@ -163,6 +164,7 @@ document.addEventListener('keydown', (e) => {
   if (state !== 'playing') return;
   if (e.key.length !== 1 && e.key !== ' ') return;
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === ' ') e.preventDefault(); // stop scroll + focused-button activation
   const expected = phrase[pos];
   const typed = e.key.toUpperCase();
   if (typed === expected) {
