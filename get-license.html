@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Your License — NEORUINS Archive Terminal</title>
+<style>
+  :root { --gold: #c9a227; --bg: #0a0a0c; --panel: #111114; --cream: #e8dcc0; --dim: #8a8a8a; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--cream); font-family: Georgia, serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card { background: var(--panel); border: 1px solid #2a2a2e; border-radius: 12px; max-width: 520px; width: 100%; padding: 40px 36px; text-align: center; }
+  h1 { color: var(--gold); font-size: 24px; margin: 0 0 8px; letter-spacing: 1px; }
+  p { color: var(--dim); font-size: 15px; line-height: 1.6; }
+  input { width: 100%; padding: 14px; margin: 18px 0 12px; background: #0a0a0c; border: 1px solid #2a2a2e; border-radius: 8px; color: var(--cream); font-size: 16px; }
+  input:focus { outline: none; border-color: var(--gold); }
+  button { width: 100%; padding: 14px; background: var(--gold); color: #0a0a0c; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; font-family: Georgia, serif; }
+  button:disabled { opacity: 0.5; cursor: wait; }
+  #msg { min-height: 24px; margin-top: 14px; font-size: 14px; }
+  #msg.err { color: #e06c6c; }
+  #msg.ok { color: #7fc97f; }
+  .steps { text-align: left; margin-top: 24px; padding-top: 20px; border-top: 1px solid #2a2a2e; font-size: 14px; color: var(--dim); }
+  .steps li { margin-bottom: 8px; }
+  a { color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>◆ NEORUINS // CLAIM LICENSE</h1>
+  <p>Enter the email address you purchased the Archive Terminal with. Your personal <code>license.key</code> will download instantly.</p>
+  <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+  <button id="go" onclick="claim()">GET MY LICENSE</button>
+  <div id="msg"></div>
+  <div class="steps">
+    <ol>
+      <li>Download your <code>license.key</code> above.</li>
+      <li>Drop it in the same folder as <code>NEORUINS.exe</code>.</li>
+      <li>Launch the app — no key entry needed, ever.</li>
+    </ol>
+    <p>Trouble? Contact <a href="mailto:hello@neoruins.com">hello@neoruins.com</a>.</p>
+  </div>
+</div>
+<script>
+  const FUNCTION_URL = "https://zzhcjxeyhloylisbsdyl.supabase.co/functions/v1/issue-license";
+
+  async function claim() {
+    const email = document.getElementById("email").value.trim();
+    const msg = document.getElementById("msg");
+    const btn = document.getElementById("go");
+    msg.className = ""; msg.textContent = "";
+    if (!email) { msg.className = "err"; msg.textContent = "Enter your purchase email first."; return; }
+    btn.disabled = true; btn.textContent = "VERIFYING…";
+    try {
+      const res = await fetch(FUNCTION_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Verification failed.");
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "license.key";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      msg.className = "ok"; msg.textContent = "License downloaded. Drop it next to NEORUINS.exe and launch.";
+    } catch (e) {
+      msg.className = "err"; msg.textContent = e.message;
+    } finally {
+      btn.disabled = false; btn.textContent = "GET MY LICENSE";
+    }
+  }
+  document.getElementById("email").addEventListener("keydown", e => { if (e.key === "Enter") claim(); });
+</script>
+</body>
+</html>
