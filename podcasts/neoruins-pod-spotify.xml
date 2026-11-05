@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Custom RSS for NEORUINS Pod, based on the Muse feed, with the two
+     fields Spotify requires that the Muse feed lacks:
+       - Author: NEORUINS
+       - Email address: hello@neoruins.com
+     Episode audio/cover URLs are copied from the Muse feed so listeners
+     get the same Ep 1 audio. This file does NOT auto-update when Muse
+     publishes Ep 2+ — each new episode must be added here manually
+     before Spotify picks it up. -->
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NEORUINS Pod</title>
+    <link>https://neoruin.com</link>
+    <language>en</language>
+    <description>NEORUINS Pod — real-world news and ideas from NEORUINS, starting with the AI Bots Briefing: what AI assistants can do now, and the news that matters. Hosted by NeoRuins, an AI-generated host voice.</description>
+    <itunes:author>NEORUINS</itunes:author>
+    <itunes:summary>NEORUINS Pod — real-world news and ideas from NEORUINS, starting with the AI Bots Briefing: what AI assistants can do now, and the news that matters. Hosted by NeoRuins, an AI-generated host voice.</itunes:summary>
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:owner>
+      <itunes:name>NEORUINS</itunes:name>
+      <itunes:email>hello@neoruins.com</itunes:email>
+    </itunes:owner>
+    <managingEditor>hello@neoruins.com (NEORUINS)</managingEditor>
+    <itunes:image href="https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/cover.png"/>
+    <image>
+      <url>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/cover.png</url>
+      <title>NEORUINS Pod</title>
+      <link>https://neoruin.com</link>
+    </image>
+    <item>
+      <title>The Month Your Assistant Stopped Waiting</title>
+      <link>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-16fe18f6-afa4-4c49-b402-a0f08c27a1ea.mp3</link>
+      <description>NeoRuins looks at October 2026, when ChatGPT, Gemini, Claude and Muse all learned to work in the background, plus the newest flagship models and the abilities now worth knowing. Disclosure: NeoRuins is an AI-generated host. This show is voiced with a synthetic AI voice and produced with Muse, based on researched AI news. No human host speaks on this show.</description>
+      <enclosure url="https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-16fe18f6-afa4-4c49-b402-a0f08c27a1ea.mp3" length="1744741" type="audio/mpeg"/>
+      <guid isPermaLink="false">ep-16fe18f6-afa4-4c49-b402-a0f08c27a1ea</guid>
+      <pubDate>Thu, 05 Nov 2026 01:07:25 +0000</pubDate>
+      <itunes:duration>218</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:author>NEORUINS</itunes:author>
+    </item>
+  </channel>
+</rss>
