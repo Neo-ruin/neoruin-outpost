@@ -14,6 +14,8 @@
     <language>en</language>
     <description>NEORUINS Pod — real-world news and ideas from NEORUINS, starting with the AI Bots Briefing: what AI assistants can do now, and the news that matters. Hosted by NeoRuins, an AI-generated host voice.</description>
     <itunes:author>NEORUINS</itunes:author>
+    <itunes:category text="Technology"/>
+    <category>Technology</category>
     <itunes:summary>NEORUINS Pod — real-world news and ideas from NEORUINS, starting with the AI Bots Briefing: what AI assistants can do now, and the news that matters. Hosted by NeoRuins, an AI-generated host voice.</itunes:summary>
     <itunes:explicit>false</itunes:explicit>
     <itunes:owner>
