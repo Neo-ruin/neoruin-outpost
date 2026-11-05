@@ -4,9 +4,9 @@
        - Author: NEORUINS
        - Email address: hello@neoruins.com
      Episode audio/cover URLs are copied from the Muse feed so listeners
-     get the same Ep 1 audio. This file does NOT auto-update when Muse
-     publishes Ep 2+ — each new episode must be added here manually
-     before Spotify picks it up. -->
+     get the same audio. This file does NOT auto-update when Muse
+     publishes new episodes — each new episode must be added here manually
+     before Spotify picks it up. Ep 2 added Nov 5, 2026. -->
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>NEORUINS Pod</title>
@@ -30,6 +30,17 @@
       <title>NEORUINS Pod</title>
       <link>https://neoruin.com</link>
     </image>
+    <item>
+      <title>Your Assistant Moved Into Your Other Apps</title>
+      <link>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-8d332210-33a7-4466-a324-0c7dc15fa5d4.mp3</link>
+      <description>Your assistant moved into the apps you already use — Adobe, Oracle, Google, Meta, and holiday shopping. Disclosure: NeoRuins is an AI-generated host. This show is voiced with a synthetic AI voice and produced with Muse, based on researched AI news. No human host speaks on this show.</description>
+      <enclosure url="https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-8d332210-33a7-4466-a324-0c7dc15fa5d4.mp3" length="3339493" type="audio/mpeg"/>
+      <guid isPermaLink="false">ep-8d332210-33a7-4466-a324-0c7dc15fa5d4</guid>
+      <pubDate>Thu, 05 Nov 2026 21:01:37 +0000</pubDate>
+      <itunes:duration>417</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:author>NEORUINS</itunes:author>
+    </item>
     <item>
       <title>The Month Your Assistant Stopped Waiting</title>
       <link>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-16fe18f6-afa4-4c49-b402-a0f08c27a1ea.mp3</link>
