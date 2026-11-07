@@ -35,12 +35,14 @@
 <body>
 <div class="card">
   <h1>◆ NEORUINS // CLAIM LICENSE</h1>
-  <p>Enter the email address you purchased the Archive Terminal with. Your personal <code>license.key</code> will download instantly.</p>
+  <p>Enter the email address you purchased the Archive Terminal with and the Order ID from your Fourthwall receipt. Your personal <code>license.key</code> will download instantly.</p>
   <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
+  <input id="orderId" type="text" placeholder="Order ID — from your Fourthwall receipt" autocomplete="off">
   <button id="go" onclick="claim()">GET MY LICENSE</button>
   <div id="msg"></div>
   <div class="steps">
     <ol>
+      <li>Find your Order ID on your Fourthwall order confirmation email.</li>
       <li>Download your <code>license.key</code> above.</li>
       <li>Drop it in the same folder as <code>NEORUINS.exe</code>.</li>
       <li>Launch the app — no key entry needed, ever.</li>
@@ -53,16 +55,18 @@
 
   async function claim() {
     const email = document.getElementById("email").value.trim();
+    const orderId = document.getElementById("orderId").value.trim();
     const msg = document.getElementById("msg");
     const btn = document.getElementById("go");
     msg.className = ""; msg.textContent = "";
     if (!email) { msg.className = "err"; msg.textContent = "Enter your purchase email first."; return; }
+    if (!orderId) { msg.className = "err"; msg.textContent = "Enter the Order ID from your Fourthwall receipt."; return; }
     btn.disabled = true; btn.textContent = "VERIFYING…";
     try {
       const res = await fetch(FUNCTION_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, orderId })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Verification failed.");
@@ -80,6 +84,7 @@
     }
   }
   document.getElementById("email").addEventListener("keydown", e => { if (e.key === "Enter") claim(); });
+  document.getElementById("orderId").addEventListener("keydown", e => { if (e.key === "Enter") claim(); });
 </script>
 </body>
 </html>
