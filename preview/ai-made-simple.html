@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="data:," />
+    <title>NEORUINS — AI, made simple</title>
+    <style>
+      :root{
+        --cream:#F7F5F0;
+        --cream-2:#F1EDE3;
+        --paper:#FFFDF8;
+        --ink:#141310;
+        --ink-soft:#3D3B35;
+        --ink-mute:#6E6A5E;
+        --hair:#DDD6C6;
+        --accent:#D95D2B;
+        --accent-deep:#BC4A1F;
+        --accent-soft:#FBE9DE;
+        --dark:#12100D;
+        --dark-2:#1C1915;
+        --void:#050508;
+        --stamp:#7CBC54;
+        --radius:18px;
+        --font-sans: ui-sans-system, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --font-hand: "Segoe Script", "Bradley Hand", "Comic Sans MS", cursive;
+        --font-mono: "Courier New", ui-monospace, "SF Mono", Menlo, monospace;
+      }
+      *{ box-sizing:border-box; }
+      html{ scroll-behavior:smooth; }
+      body{
+        margin:0;
+        background:var(--cream);
+        color:var(--ink);
+        font-family:var(--font-sans);
+        font-size:17px;
+        line-height:1.55;
+        overflow-x:hidden;
+        -webkit-font-smoothing:antialiased;
+      }
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height:2.75rem; }
+      button{ font:inherit; cursor:pointer; }
+      a{ color:inherit; }
+      :focus-visible{ outline:3px solid var(--accent); outline-offset:2px; border-radius:6px; }
+      .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+      section[id], header[id]{ scroll-margin-top:84px; }
+
+      /* ---------- Nav ---------- */
+      .nav{
+        position:sticky; top:0; z-index:60;
+        background:rgba(247,245,240,.92);
+        backdrop-filter:blur(10px);
+        border-bottom:1px solid var(--hair);
+      }
+      .nav-in{ display:flex; align-items:center; gap:28px; height:60px; }
+      .wordmark{ font-weight:900; letter-spacing:.14em; font-size:19px; text-decoration:none; white-space:nowrap; }
+      .wordmark b{ color:var(--accent); font-weight:900; }
+      .nav-links{ display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; }
+      .nav-links a{
+        text-decoration:none; font-size:15px; font-weight:600; color:var(--ink-soft);
+        padding:10px 12px; border-radius:999px; display:inline-flex; align-items:center; min-height:44px;
+      }
+      .nav-links a:hover{ color:var(--ink); background:var(--cream-2); }
+      .nav-cta{
+        margin-left:8px; background:var(--ink); color:var(--cream); border:none; border-radius:999px;
+        padding:10px 18px; font-weight:700; font-size:15px; text-decoration:none; display:inline-flex; align-items:center; min-height:44px; white-space:nowrap;
+      }
+      .nav-cta:hover{ background:var(--accent-deep); }
+
+      /* ---------- Hero ---------- */
+      .hero{ padding:56px 0 128px; }
+      .hero-grid{ display:grid; grid-template-columns:1fr 1.05fr; gap:56px; align-items:center; }
+      .hero-grid > *, .about-grid > *{ min-width:0; }
+      .eyebrow{
+        display:inline-flex; align-items:center; gap:8px;
+        font-size:13px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-deep);
+        margin:0 0 20px;
+      }
+      .eyebrow::before{ content:""; width:26px; height:2px; background:var(--accent); display:inline-block; }
+      h1{
+        font-size:clamp(36px, 10.5vw, 68px); line-height:1.02; letter-spacing:-.025em;
+        font-weight:900; margin:0 0 22px;
+      }
+      h1 .hl{ color:var(--accent); }
+      .lede{ font-size:20px; color:var(--ink-soft); margin:0 0 30px; max-width:30em; }
+      .hero-cta{ display:flex; gap:10px; flex-wrap:wrap; }
+      .hero-cta .btn-ghost{ display:inline-flex; align-items:center; text-decoration:none; }
+      .btn-accent{
+        background:var(--accent); color:#fff; border:none; border-radius:999px;
+        padding:13px 26px; font-weight:800; min-height:52px; white-space:nowrap;
+      }
+      .btn-accent:hover{ background:var(--accent-deep); }
+      .hero-points{ display:flex; gap:22px; flex-wrap:wrap; margin-top:30px; padding:0; list-style:none; }
+      .hero-points li{ font-size:15px; font-weight:600; color:var(--ink-soft); display:flex; align-items:center; gap:8px; }
+      .hero-points li::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--stamp); flex:none; }
+
+      /* ---------- Holo-foil stage ---------- */
+      .stage-col{ position:relative; margin-top:52px; }
+      .stage{
+        position:relative; border-radius:26px; overflow:hidden; background:var(--void);
+        aspect-ratio: 4 / 4.6; min-height:480px;
+        box-shadow:0 30px 60px -22px rgba(20,19,16,.45);
+        isolation:isolate;
+      }
+      .stage .glow{
+        position:absolute; inset:0; z-index:0;
+        background:radial-gradient(120% 90% at 50% 30%, #121521 0%, #090a10 62%, #050508 100%);
+      }
+      .stage canvas.stage-gl{
+        position:absolute; inset:0; z-index:1; width:100%; height:100%; display:block;
+        touch-action:none; cursor:grab; background:transparent;
+      }
+      .stage canvas.stage-gl.grabbing{ cursor:grabbing; }
+      .stage .grain{
+        position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.44; mix-blend-mode:soft-light;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+        background-size:160px 160px;
+      }
+      .stage .vignette{
+        position:absolute; inset:0; z-index:3; pointer-events:none;
+        background:radial-gradient(115% 100% at 50% 42%, transparent 55%, rgba(0,0,0,.55) 100%);
+      }
+      .stage .poster{
+        position:absolute; inset:0; z-index:1; display:none;
+        align-items:center; justify-content:center; text-align:center; padding:32px;
+        color:#E9E4D8; font-family:var(--font-mono); letter-spacing:.2em; font-size:15px; text-transform:uppercase;
+        background:
+          radial-gradient(90% 70% at 30% 20%, rgba(148,28,82,.5), transparent 60%),
+          radial-gradient(80% 70% at 75% 80%, rgba(92,38,42,.55), transparent 60%),
+          linear-gradient(150deg, #1e232f, #12141d);
+      }
+      .stage.no-webgl .poster{ display:flex; }
+      .stage.no-webgl canvas.stage-gl{ display:none; }
+      .stage .poster .stamp-ring{
+        display:inline-flex; align-items:center; justify-content:center;
+        width:104px; height:104px; border:2.5px solid var(--stamp); border-radius:50%;
+        color:var(--stamp); font-size:12px; letter-spacing:.18em; margin-bottom:20px; transform:rotate(-9deg);
+      }
+      .stage-tag{
+        position:absolute; left:18px; bottom:16px; z-index:4; pointer-events:none;
+        font-family:var(--font-mono); font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:rgba(233,228,216,.72);
+      }
+      .note{
+        position:absolute; z-index:5; font-family:var(--font-hand); color:var(--accent-deep);
+        font-size:clamp(18px, 2vw, 22px); line-height:1.15; pointer-events:none; max-width:180px;
+      }
+      .note svg{ display:block; overflow:visible; }
+      .note-1{ top:-54px; left:2px; transform:rotate(-6deg); }
+      .note-1 svg{ margin:2px 0 0 58px; }
+      .note-2{ bottom:-62px; right:4px; transform:rotate(3deg); text-align:right; }
+      .note-2 svg{ margin:0 40px 2px auto; transform:scaleX(-1); }
+
+      /* ---------- Sections ---------- */
+      section.block{ padding:84px 0; }
+      .sec-head{ max-width:640px; margin-bottom:44px; }
+      .sec-head h2{ font-size:clamp(30px, 3.6vw, 44px); line-height:1.08; letter-spacing:-.02em; font-weight:900; margin:0 0 14px; }
+      .sec-head p{ color:var(--ink-soft); font-size:18.5px; margin:0; }
+
+      /* Prompt demo */
+      .demo-shell{ background:var(--dark); border-radius:24px; padding:28px; color:#EFEAE0; }
+      .demo-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+      .demo-tab{
+        background:transparent; color:#B9B2A2; border:1.5px solid #3A352C; border-radius:999px;
+        padding:10px 18px; font-weight:700; font-size:15px; min-height:44px;
+      }
+      .demo-tab[aria-selected="true"]{ background:var(--accent); border-color:var(--accent); color:#fff; }
+      .demo-panel{ background:#0B0A08; border:1px solid #2C2820; border-radius:14px; padding:22px; }
+      .demo-panel pre{
+        margin:0; font-family:var(--font-mono); font-size:15.5px; line-height:1.65; white-space:pre-wrap; word-break:break-word; color:#F2EDDF;
+      }
+      .demo-actions{ display:flex; align-items:center; gap:14px; margin-top:18px; flex-wrap:wrap; }
+      .copy-btn{
+        background:var(--paper); color:var(--ink); border:none; border-radius:999px; padding:11px 22px; font-weight:800; min-height:46px;
+      }
+      .copy-btn.copied{ background:var(--stamp); color:#0E2006; }
+      .demo-where{ color:#B9B2A2; font-size:14.5px; }
+      .next-box{
+        display:none; margin-top:18px; background:var(--dark-2); border:1px solid #3A352C; border-radius:14px; padding:20px 22px;
+      }
+      .next-box.show{ display:block; }
+      .next-box h4{ margin:0 0 6px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--stamp); }
+      .next-box p{ margin:0; color:#EFEAE0; font-size:16px; }
+
+      /* Finder */
+      .finder{ background:var(--paper); border:1px solid var(--hair); border-radius:24px; padding:36px; }
+      .finder-progress{ font-size:13px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-mute); margin:0 0 10px; }
+      .finder h3{ font-size:26px; font-weight:900; letter-spacing:-.015em; margin:0 0 22px; }
+      .finder-opts{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+      .finder-opt{
+        text-align:left; background:var(--cream); border:1.5px solid var(--hair); border-radius:14px;
+        padding:16px 18px; font-weight:700; font-size:16.5px; min-height:56px;
+      }
+      .finder-opt:hover{ border-color:var(--accent); background:var(--accent-soft); }
+      .finder-result{ display:none; }
+      .finder-result.show{ display:block; }
+      .finder-result .rec{
+        font-size:30px; font-weight:900; letter-spacing:-.02em; margin:0 0 8px;
+      }
+      .finder-result .rec span{ color:var(--accent); }
+      .finder-result p{ color:var(--ink-soft); margin:0 0 20px; max-width:44em; }
+      .btn-ghost{
+        background:transparent; border:1.5px solid var(--ink); border-radius:999px; padding:11px 22px; font-weight:800; min-height:48px;
+      }
+      .btn-ghost:hover{ background:var(--ink); color:var(--cream); }
+
+      /* About */
+      .about-grid{ display:grid; grid-template-columns:.85fr 1.15fr; gap:56px; align-items:center; }
+      .about-tile{
+        background:var(--dark); color:var(--cream); border-radius:24px; padding:38px; position:relative; overflow:hidden;
+      }
+      .about-tile .big{ font-size:clamp(34px,4vw,50px); font-weight:900; letter-spacing:.06em; line-height:1.05; margin:0 0 14px; }
+      .about-tile .big span{ color:var(--accent); }
+      .about-tile p{ color:#CFC8B8; margin:0; font-size:16.5px; }
+      .about-tile .stampy{
+        position:absolute; right:22px; top:22px; width:88px; height:88px; border:2.5px solid var(--stamp); border-radius:50%;
+        color:var(--stamp); display:flex; align-items:center; justify-content:center; text-align:center;
+        font-family:var(--font-mono); font-size:10.5px; letter-spacing:.14em; transform:rotate(10deg); text-transform:uppercase; padding:8px;
+      }
+      .about-copy h2{ font-size:clamp(30px,3.6vw,44px); font-weight:900; letter-spacing:-.02em; line-height:1.08; margin:0 0 18px; }
+      .about-copy p{ color:var(--ink-soft); font-size:18px; margin:0 0 16px; }
+      .about-copy .handle{ font-weight:800; color:var(--ink); }
+      .about-copy a.tiktok{ color:var(--accent-deep); font-weight:800; }
+
+      /* Tools */
+      .tools-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+      .tool-card{ background:var(--paper); border:1px solid var(--hair); border-radius:var(--radius); padding:24px; }
+      .tool-card .t-ico{
+        width:46px; height:46px; border-radius:12px; background:var(--ink); color:var(--cream);
+        display:flex; align-items:center; justify-content:center; font-weight:900; font-size:19px; margin-bottom:16px;
+      }
+      .tool-card h3{ margin:0 0 6px; font-size:19px; font-weight:800; }
+      .tool-card p{ margin:0; color:var(--ink-soft); font-size:15.5px; }
+      .tool-card .use{ display:block; margin-top:12px; font-size:13px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-deep); }
+
+      /* Footer */
+      footer{ background:var(--dark); color:var(--cream); padding:64px 0 40px; margin-top:20px; }
+      .foot-grid{ display:flex; justify-content:space-between; gap:32px; flex-wrap:wrap; margin-bottom:48px; }
+      .foot-grid p{ color:#B9B2A2; max-width:26em; margin:8px 0 0; }
+      .foot-links{ display:flex; gap:26px; flex-wrap:wrap; }
+      .foot-links a{ color:var(--cream); text-decoration:none; font-weight:700; padding:10px 4px; display:inline-flex; align-items:center; min-height:44px; }
+      .foot-links a:hover{ color:var(--accent); }
+      .foot-mark{ font-size:clamp(56px, 12.5vw, 168px); font-weight:900; letter-spacing:.02em; line-height:.95; margin:0; color:var(--cream); }
+      .foot-mark span{ color:var(--accent); }
+      .foot-fine{ display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; border-top:1px solid #2C2820; padding-top:22px; margin-top:34px; color:#8B8474; font-size:14px; }
+
+      @media (max-width: 960px){
+        .hero-grid, .about-grid{ grid-template-columns:1fr; gap:44px; }
+        .hero{ padding-top:40px; }
+        .stage{ aspect-ratio:4/4.2; min-height:440px; }
+        .tools-grid{ grid-template-columns:repeat(2, 1fr); }
+        .note-1{ left:2px; }
+      }
+      @media (max-width: 700px){
+        section[id], header[id]{ scroll-margin-top:150px; }
+        .nav-in{ height:auto; min-height:60px; flex-wrap:wrap; padding:8px 0; gap:2px 12px; }
+        .nav-links{ order:2; width:100%; margin-left:0; }
+      }
+      @media (max-width: 620px){
+        body{ font-size:16px; }
+        .wrap{ padding:0 18px; }
+        .nav-links a{ padding:10px 8px; font-size:14px; }
+        .nav-cta{ display:none; }
+        section.block{ padding:60px 0; }
+        .finder{ padding:26px 20px; }
+        .finder-opts{ grid-template-columns:1fr; }
+        .tools-grid{ grid-template-columns:1fr; }
+        .demo-shell{ padding:20px 16px; }
+        .stage{ min-height:420px; }
+        .note-2{ bottom:-58px; }
+      }
+      @media (prefers-reduced-motion: reduce){
+        html{ scroll-behavior:auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav" aria-label="Main">
+      <div class="wrap nav-in">
+        <a class="wordmark" href="#top">NEO<b>RUINS</b></a>
+        <div class="nav-links">
+          <a href="#prompts">Prompts</a>
+          <a href="#finder">Tool finder</a>
+          <a href="#about">About</a>
+          <a href="#tools">Tools</a>
+        </div>
+        <a class="nav-cta" href="#prompts">Try a prompt</a>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow">AI, in plain English</p>
+          <h1>AI is easier than it <span class="hl">looks.</span> I'll show you.</h1>
+          <p class="lede">I'm Angelo. I make short, friendly videos and prompts that turn ChatGPT, Claude and the rest into tools you can actually use — no tech degree, no jargon, no hype.</p>
+          <div class="hero-cta">
+            <a class="btn-accent" href="#prompts" style="display:inline-flex;align-items:center;text-decoration:none;">Steal a prompt</a>
+            <a class="btn-ghost" href="https://www.tiktok.com/@neoruin_" target="_blank" rel="noopener">Watch on TikTok</a>
+          </div>
+          <ul class="hero-points">
+            <li>Copy-paste prompts</li>
+            <li>Short videos on TikTok</li>
+          </ul>
+        </div>
+
+        <div class="stage-col">
+          <p class="note note-1">this is the fun part — grab it!
+            <svg width="52" height="44" viewBox="0 0 52 44" fill="none" aria-hidden="true"><path d="M4 4 C 20 26, 30 30, 44 34 M 44 34 l -11 -2 M 44 34 l -3 -10" stroke="#BC4A1F" stroke-width="2" stroke-linecap="round"/></svg>
+          </p>
+          <div class="stage" id="foil-stage">
+            <div class="glow" aria-hidden="true"></div>
+            <div class="poster" aria-hidden="true">
+              <div>
+                <span class="stamp-ring">NEORUINS<br/>EST. ONLINE</span>
+                <div>NEORUINS<br/>AI made simple<br/><span style="font-size:12px;opacity:.75;">Prompts · Tools · Plain English</span></div>
+              </div>
+            </div>
+            <p class="stage-tag">NEORUINS — holo edition</p>
+          </div>
+          <p class="note note-2">
+            <svg width="52" height="44" viewBox="0 0 52 44" fill="none" aria-hidden="true"><path d="M4 4 C 20 26, 30 30, 44 34 M 44 34 l -11 -2 M 44 34 l -3 -10" stroke="#BC4A1F" stroke-width="2" stroke-linecap="round"/></svg>
+            it settles on its own, watch
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Prompt demo -->
+      <section class="block" id="prompts" style="background:var(--cream-2);">
+        <div class="wrap">
+          <div class="sec-head">
+            <p class="eyebrow">Try it right now</p>
+            <h2>Steal a prompt. See how it feels.</h2>
+            <p>Pick a job, copy the prompt, paste it into whichever AI you use. That's the whole trick — a good prompt does the heavy lifting.</p>
+          </div>
+          <div class="demo-shell">
+            <div class="demo-tabs" role="tablist" aria-label="Prompt examples">
+              <button class="demo-tab" role="tab" aria-selected="true" data-tab="0">Explain it simply</button>
+              <button class="demo-tab" role="tab" aria-selected="false" data-tab="1">Plan my week</button>
+              <button class="demo-tab" role="tab" aria-selected="false" data-tab="2">Fix my writing</button>
+            </div>
+            <div class="demo-panel">
+              <pre id="demo-prompt"></pre>
+              <div class="demo-actions">
+                <button class="copy-btn" id="copy-btn" type="button">Copy prompt</button>
+                <span class="demo-where" id="demo-where"></span>
+              </div>
+              <div class="next-box" id="next-box">
+                <h4>Do this next</h4>
+                <p id="next-text"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Finder -->
+      <section class="block" id="finder" style="background:var(--cream-2);">
+        <div class="wrap">
+          <div class="sec-head">
+            <p class="eyebrow">Not sure where to start?</p>
+            <h2>Answer three questions. Get one tool.</h2>
+            <p>Too many tools is the problem, not you. This takes twenty seconds and points you at the single best place to begin.</p>
+          </div>
+          <div class="finder" id="finder-box">
+            <div id="finder-quiz">
+              <p class="finder-progress" id="finder-step">Question 1 of 3</p>
+              <h3 id="finder-q"></h3>
+              <div class="finder-opts" id="finder-opts"></div>
+            </div>
+            <div class="finder-result" id="finder-result" role="status">
+              <p class="finder-progress">Your starting point</p>
+              <p class="rec">Start with <span id="rec-tool"></span></p>
+              <p id="rec-why"></p>
+              <button class="btn-ghost" type="button" id="finder-again">Start the quiz again</button>
+              <a class="btn-accent" href="#prompts" style="display:inline-flex;align-items:center;text-decoration:none;margin-left:10px;">Try a prompt</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section class="block" id="about">
+        <div class="wrap about-grid">
+          <div class="about-tile">
+            <span class="stampy">AI made simple • NEORUINS •</span>
+            <p class="big">NEO<span>RUINS</span></p>
+            <p>Old ruins, new tools. I dig through every new AI release so you only get the parts worth your time — tested, translated, and shown on camera.</p>
+          </div>
+          <div class="about-copy">
+            <p class="eyebrow">About</p>
+            <h2>Hi, I'm Angelo Padula.</h2>
+            <p>I post AI content on TikTok as <a class="tiktok" href="https://www.tiktok.com/@neoruin_" target="_blank" rel="noopener">@neoruin_</a> — short videos that make AI simple for everyday people. No “10x your synergies”, no pretending you need a computer science degree. Just: here's the tool, here's what it does, here's you using it five minutes from now.</p>
+            <p>NEORUINS is where the videos grow up: the prompts worth keeping, and the tools that earn their place.</p>
+            <p class="handle">Find me on TikTok — <a class="tiktok" href="https://www.tiktok.com/@neoruin_" target="_blank" rel="noopener">@neoruin_</a> — and say hi in the comments. I read them.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tools -->
+      <section class="block" id="tools" style="background:var(--cream-2);">
+        <div class="wrap">
+          <div class="sec-head">
+            <p class="eyebrow">My daily stack</p>
+            <h2>The AI tools I actually open every day</h2>
+            <p>Not an affiliate wall — just the small set that earns its place on my home screen, and what each one is for.</p>
+          </div>
+          <div class="tools-grid">
+            <div class="tool-card"><div class="t-ico">C</div><h3>ChatGPT</h3><p>First drafts, brainstorming, quick questions and talking through ideas out loud on my walks.</p><span class="use">For writing &amp; thinking</span></div>
+            <div class="tool-card"><div class="t-ico">Cl</div><h3>Claude</h3><p>Long documents, careful rewrites, and anything where tone matters more than speed.</p><span class="use">For long reads &amp; rewrites</span></div>
+            <div class="tool-card"><div class="t-ico">G</div><h3>Gemini</h3><p>Inside Google Docs and Gmail, and for questions where a fresh web answer matters.</p><span class="use">For Google apps &amp; research</span></div>
+            <div class="tool-card"><div class="t-ico">M</div><h3>Midjourney</h3><p>Thumbnails, cover art and the moody visuals behind the NEORUINS look.</p><span class="use">For images &amp; art</span></div>
+            <div class="tool-card"><div class="t-ico">Cc</div><h3>CapCut</h3><p>Editing TikToks, auto-captions and cleaning up audio without opening a “real” editor.</p><span class="use">For short video</span></div>
+            <div class="tool-card"><div class="t-ico">Ca</div><h3>Canva</h3><p>Covers, carousels and anything that needs to look tidy in ten minutes.</p><span class="use">For quick design</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <div class="foot-grid">
+          <div>
+            <p style="font-weight:900;letter-spacing:.14em;font-size:18px;color:var(--cream);margin:0;">NEO<span style="color:var(--accent)">RUINS</span></p>
+            <p>AI made simple for everyday people — stealable prompts and the tools that earn their place.</p>
+          </div>
+          <div class="foot-links">
+            <a href="#prompts">Prompts</a>
+            <a href="#finder">Tool finder</a>
+            <a href="https://www.tiktok.com/@neoruin_" target="_blank" rel="noopener">TikTok @neoruin_</a>
+          </div>
+        </div>
+        <p class="foot-mark">NEO<span>RUINS</span></p>
+        <div class="foot-fine">
+          <span>© Angelo Padula — NEORUINS</span>
+          <span>Cuyahoga Falls, Ohio</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script>
+    (function(){
+      "use strict";
+
+      /* ---------- Prompt demo ---------- */
+      var PROMPTS = [
+        {
+          text: "Explain this to me like I'm smart but busy:\n\n[paste the topic, article or idea here]\n\nUse everyday words, no jargon. Give me one short real-life example, then tell me the one thing most people get wrong about it. Keep the whole answer under 200 words.",
+          where: "Works in ChatGPT, Claude or Gemini — free versions are fine.",
+          next: "Swap the [brackets] for something you've been putting off understanding — taxes, a contract clause, a medical term. Then ask one follow-up: “give me an example with numbers.” That's where it clicks."
+        },
+        {
+          text: "Here is everything on my plate this week:\n\n[paste your messy list — every task, deadline and errand, in any order]\n\nTurn it into a day-by-day plan. Put the hardest thing first each day, group the errands together, and leave one afternoon completely empty. If something doesn't fit, tell me what to drop and why.",
+          where: "Best in ChatGPT or Claude — both handle a messy brain-dump well.",
+          next: "Don't edit the list before pasting. The mess is the point — sorting it is the AI's job, not yours. When the plan comes back, ask: “what would make this week easier?” and steal its best answer."
+        },
+        {
+          text: "Rewrite this so it sounds like a confident human, not a robot:\n\n[paste your email, message or post here]\n\nKeep my meaning exactly. Make it warmer and shorter. Fix the grammar, then give me two versions: one friendly, one firm. Don't use words like “delve”, “furthermore” or “I hope this email finds you well”.",
+          where: "Claude is the gentlest editor; ChatGPT is the fastest. Either works.",
+          next: "Always read the rewrite out loud before sending — if you'd never say it, ask for it “in my voice” and paste a short message you wrote that sounds like you. It'll match your style from then on."
+        }
+      ];
+      var pre = document.getElementById("demo-prompt");
+      var where = document.getElementById("demo-where");
+      var nextBox = document.getElementById("next-box");
+      var nextText = document.getElementById("next-text");
+      var copyBtn = document.getElementById("copy-btn");
+      var tabs = Array.prototype.slice.call(document.querySelectorAll(".demo-tab"));
+      var current = 0;
+
+      function showPrompt(i){
+        current = i;
+        pre.textContent = PROMPTS[i].text;
+        where.textContent = PROMPTS[i].where;
+        nextText.textContent = PROMPTS[i].next;
+        nextBox.classList.remove("show");
+        copyBtn.textContent = "Copy prompt";
+        copyBtn.classList.remove("copied");
+        tabs.forEach(function(t, j){ t.setAttribute("aria-selected", j === i ? "true" : "false"); });
+      }
+      tabs.forEach(function(t){
+        t.addEventListener("click", function(){ showPrompt(parseInt(t.getAttribute("data-tab"), 10)); });
+      });
+      showPrompt(0);
+
+      copyBtn.addEventListener("click", function(){
+        var text = PROMPTS[current].text;
+        function done(){
+          copyBtn.textContent = "Copied ✓";
+          copyBtn.classList.add("copied");
+          nextBox.classList.add("show");
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+        } else { fallbackCopy(text); done(); }
+      });
+      function fallbackCopy(text){
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); } catch(e){}
+        document.body.removeChild(ta);
+      }
+
+      /* ---------- Tool finder quiz ---------- */
+      var QUESTIONS = [
+        { q: "What do you most want AI to do for you?",
+          opts: [
+            { label: "Write things — emails, posts, ideas", tool: "chatgpt" },
+            { label: "Make pictures and art", tool: "midjourney" },
+            { label: "Help inside Gmail and Google Docs", tool: "gemini" },
+            { label: "Read long things and explain them", tool: "claude" }
+          ]},
+        { q: "How do you feel about learning a new app?",
+          opts: [
+            { label: "Love it — give me the powerful one", tool: null },
+            { label: "Fine, if it looks like apps I know", tool: null },
+            { label: "Nervous — show me the friendliest one", tool: null },
+            { label: "I just want it inside what I already use", tool: "gemini" }
+          ]},
+        { q: "Be honest — how much time will you give this?",
+          opts: [
+            { label: "Five minutes, tops", tool: null },
+            { label: "A lazy Sunday afternoon", tool: null },
+            { label: "A little bit every day", tool: null },
+            { label: "As long as it takes to get good", tool: null }
+          ]}
+      ];
+      var RECS = {
+        chatgpt: { name: "ChatGPT", why: "It's the best all-rounder and the friendliest place to start: ask it anything in plain words, and it answers in plain words. Begin with the “Explain it simply” prompt above — you'll have your first real win today." },
+        claude: { name: "Claude", why: "If you deal with long documents, contracts or careful writing, Claude is the one. It reads patiently, explains clearly and rewrites without making you sound like a press release. Start with one document you've been avoiding and the “Fix my writing” prompt above." },
+        gemini: { name: "Gemini", why: "You already live in Google's apps, so Gemini meets you where you are — inside Gmail, Docs and search, no new habits required." },
+        midjourney: { name: "Midjourney", why: "You think in pictures — good. Midjourney turns a sentence into art, and the learning curve is shorter than it looks. Start with one sentence describing a picture you want — your first genuinely good image is about three tries away." }
+      };
+      var step = 0, pickedTool = null;
+      var stepEl = document.getElementById("finder-step");
+      var qEl = document.getElementById("finder-q");
+      var optsEl = document.getElementById("finder-opts");
+      var quizEl = document.getElementById("finder-quiz");
+      var resultEl = document.getElementById("finder-result");
+
+      function renderStep(){
+        stepEl.textContent = "Question " + (step + 1) + " of " + QUESTIONS.length;
+        qEl.textContent = QUESTIONS[step].q;
+        optsEl.innerHTML = "";
+        QUESTIONS[step].opts.forEach(function(o){
+          var b = document.createElement("button");
+          b.type = "button"; b.className = "finder-opt"; b.textContent = o.label;
+          b.addEventListener("click", function(){
+            if (o.tool) pickedTool = o.tool;
+            step++;
+            if (step < QUESTIONS.length) renderStep(); else showResult();
+          });
+          optsEl.appendChild(b);
+        });
+      }
+      function showResult(){
+        var rec = RECS[pickedTool || "chatgpt"];
+        document.getElementById("rec-tool").textContent = rec.name;
+        document.getElementById("rec-why").textContent = rec.why;
+        quizEl.style.display = "none";
+        resultEl.classList.add("show");
+      }
+      document.getElementById("finder-again").addEventListener("click", function(){
+        step = 0; pickedTool = null;
+        resultEl.classList.remove("show");
+        quizEl.style.display = "block";
+        renderStep();
+      });
+      renderStep();
+    })();
+    </script>
+
+    <script>
+    /* ============================================================
+       NEORUINS holo-foil cloth
+       Verlet cloth 42x42 · no gravity · damping 0.972
+       6 constraint passes @ stiffness 0.22 · fixed 60 Hz step
+       Grab: nearest point on a camera-facing plane, lerp 0.31,
+       5x5 Gaussian falloff, momentum flick on release
+       Camera: 32° elevation, damping 0.084, orbit speed 0.30,
+       distance 2.8–8.8, no pan · double-tap (<300 ms) resets
+       ============================================================ */
+    (function(){
+      "use strict";
+      var stage = document.getElementById("foil-stage");
+      if (!stage) return;
+
+      var webglOK = false;
+      try {
+        var probe = document.createElement("canvas");
+        webglOK = !!(window.WebGLRenderingContext && (probe.getContext("webgl") || probe.getContext("experimental-webgl")));
+      } catch(e){ webglOK = false; }
+      if (!webglOK || typeof THREE === "undefined"){
+        stage.classList.add("no-webgl");
+        return;
+      }
+
+      var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* ---------- Print texture (Courier New, 30px caps) ---------- */
+      function makeTexture(){
+        var c = document.createElement("canvas");
+        c.width = 1024; c.height = 1280;
+        var g = c.getContext("2d");
+        g.fillStyle = "#1e232f";
+        g.fillRect(0, 0, c.width, c.height);
+        // subtle woven shading bands
+        for (var i = 0; i < 64; i++){
+          g.fillStyle = "rgba(255,255,255," + (i % 2 ? 0.012 : 0) + ")";
+          g.fillRect(0, i * 20, c.width, 10);
+        }
+        var inks = ["#1c0a34", "#5c262a", "#941c52"];
+        // repeated small caps lines
+        g.font = "30px 'Courier New', monospace";
+        g.textAlign = "center";
+        var lines = ["AI MADE SIMPLE", "NEORUINS", "PLAIN ENGLISH ONLY", "EST. ON TIKTOK", "@NEORUIN_"];
+        for (var y = 70; y < c.height - 40; y += 64){
+          var li = Math.floor((y / 64)) % lines.length;
+          g.fillStyle = inks[Math.floor((y / 64)) % inks.length];
+          g.globalAlpha = 0.30;
+          g.fillText(lines[li], c.width / 2, y);
+        }
+        // hero print, foil-stamped (ink at ~76–82%)
+        g.globalAlpha = 0.80;
+        g.fillStyle = inks[2];
+        g.font = "bold 118px 'Courier New', monospace";
+        g.fillText("NEORUINS", c.width / 2, 560);
+        g.globalAlpha = 0.76;
+        g.fillStyle = inks[0];
+        g.font = "30px 'Courier New', monospace";
+        g.fillText("A I   M A D E   S I M P L E", c.width / 2, 622);
+        g.globalAlpha = 0.82;
+        g.fillStyle = inks[1];
+        g.fillText("PROMPTS · TOOLS · PLAIN ENGLISH", c.width / 2, 668);
+        // stamp
+        g.save();
+        g.translate(800, 330); g.rotate(-0.16);
+        g.globalAlpha = 0.9;
+        g.strokeStyle = "#7cbc54"; g.lineWidth = 5;
+        g.beginPath(); g.arc(0, 0, 108, 0, Math.PI * 2); g.stroke();
+        g.beginPath(); g.arc(0, 0, 88, 0, Math.PI * 2); g.lineWidth = 2; g.stroke();
+        g.fillStyle = "#7cbc54";
+        g.font = "bold 26px 'Courier New', monospace";
+        g.fillText("FREE", 0, -12);
+        g.fillText("PROMPTS", 0, 22);
+        g.font = "17px 'Courier New', monospace";
+        g.fillText("NO JARGON", 0, 52);
+        g.restore();
+        // frame ticks
+        g.globalAlpha = 0.5; g.strokeStyle = "#E9E4D8"; g.lineWidth = 2;
+        g.strokeRect(26, 26, c.width - 52, c.height - 52);
+        g.globalAlpha = 1;
+        var tex = new THREE.CanvasTexture(c);
+        tex.anisotropy = 4;
+        return tex;
+      }
+
+      /* ---------- Renderer / scene / camera ---------- */
+      var renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+      } catch(e){ stage.classList.add("no-webgl"); return; }
+      renderer.setClearColor(0x000000, 0);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.domElement.className = "stage-gl";
+      renderer.domElement.setAttribute("aria-label", "Interactive holographic NEORUINS cloth — drag to pull it, drag the background to look around it, double-tap to reset");
+      stage.insertBefore(renderer.domElement, stage.querySelector(".grain"));
+      var canvas = renderer.domElement;
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(38, 1, 0.1, 60);
+
+      // Camera orbit state: 32° elevation, damping 0.084, speed 0.30, dist 2.8–8.8, no pan
+      var CAM = { defDist: 5.4, defTheta: 0.38, defPhi: THREE.MathUtils.degToRad(90 - 32) };
+      var camTarget = { theta: CAM.defTheta, phi: CAM.defPhi, dist: CAM.defDist };
+      var camCur = { theta: CAM.defTheta, phi: CAM.defPhi, dist: CAM.defDist };
+      function placeCamera(){
+        var sp = Math.sin(camCur.phi), y = Math.cos(camCur.phi);
+        camera.position.set(
+          camCur.dist * sp * Math.sin(camCur.theta),
+          camCur.dist * y,
+          camCur.dist * sp * Math.cos(camCur.theta)
+        );
+        camera.lookAt(0, -0.05, 0);
+      }
+
+      /* ---------- Foil shader ---------- */
+      var foilMat = new THREE.ShaderMaterial({
+        uniforms: {
+          tPrint: { value: makeTexture() },
+          uTime: { value: 0 }
+        },
+        vertexShader: [
+          "varying vec2 vUv;",
+          "varying vec3 vN;",
+          "varying vec3 vWp;",
+          "void main(){",
+          "  vUv = uv;",
+          "  vN = normalize(normalMatrix * normal);",
+          "  vec4 wp = modelMatrix * vec4(position, 1.0);",
+          "  vWp = wp.xyz;",
+          "  gl_Position = projectionMatrix * viewMatrix * wp;",
+          "}"
+        ].join("\n"),
+        fragmentShader: [
+          "uniform sampler2D tPrint;",
+          "uniform float uTime;",
+          "varying vec2 vUv;",
+          "varying vec3 vN;",
+          "varying vec3 vWp;",
+          "vec3 wash(float t){",
+          "  vec3 col = 0.5 + 0.5 * cos(6.28318 * (t + vec3(0.0, 0.33, 0.67)));",
+          "  col.g *= 0.25;", // green skipped in the rainbow washes
+          "  return col;",
+          "}",
+          "void main(){",
+          "  vec4 tex = texture2D(tPrint, vUv);",
+          "  vec3 N = normalize(vN);",
+          "  vec3 V = normalize(cameraPosition - vWp);",
+          "  float ndv = clamp(dot(N, V), 0.0, 1.0);",
+          "  float ang = (1.0 - ndv) * 2.2 + vUv.x * 1.35 + vUv.y * 0.7 + N.x * 1.6;",
+          "  vec3 holo = wash(ang) * 0.34 + wash(ang * 1.7 + 0.31) * 0.22 + wash(ang * 0.55 + 0.63) * 0.16;", // 3 rainbow washes
+          "  float film = sin(ndv * 14.0 + vUv.x * 9.0 + vUv.y * 5.0) * 0.5 + 0.5;", // thin-film tint
+          "  holo += film * vec3(0.05, 0.015, 0.07);",
+          "  float fres = pow(1.0 - ndv, 2.6);", // fresnel rim
+          "  vec3 L = normalize(vec3(0.45, 0.75, 0.85));",
+          "  float glint = pow(max(dot(reflect(-L, N), V), 0.0), 64.0) * 1.15", // glints facing camera
+          "              + pow(max(dot(reflect(-L, N), V), 0.0), 9.0) * 0.14;",
+          "  vec3 base = tex.rgb * 0.94 + holo * 0.06;", // 6% holo bleed through the print
+          "  vec3 col = base + holo * (0.22 + fres * 0.55) + fres * vec3(0.55, 0.30, 0.62) * 0.5 + glint * vec3(1.0, 0.96, 0.9);",
+          "  gl_FragColor = vec4(col, 1.0);",
+          "}"
+        ].join("\n"),
+        side: THREE.DoubleSide
+      });
+
+      /* ---------- Cloth: Verlet 42 x 42 ---------- */
+      var N = 42;
+      var W = 3.35, H = 4.05;
+      var count = N * N;
+      var pos = new Float32Array(count * 3);
+      var prev = new Float32Array(count * 3);
+      var home = new Float32Array(count * 3);
+      var pinned = new Uint8Array(count);
+
+      function drape(x, y){
+        // one frame, already draped: 11 summed waves
+        var z = 0;
+        for (var k = 1; k <= 11; k++){
+          var f = 1.1 + k * 0.62;
+          var amp = 0.16 / Math.pow(k, 0.72);
+          z += Math.sin(x * f + k * 1.93) * amp * (0.55 + 0.45 * Math.cos(y * (0.6 + k * 0.14)));
+          z += Math.cos(y * (f * 0.42) + x * (0.8 + k * 0.21) + k * 0.77) * amp * 0.38;
+        }
+        // gentle bottom curl
+        z += Math.pow(Math.max(0, -y), 2) * 0.05;
+        return z;
+      }
+      function resetCloth(){
+        for (var j = 0; j < N; j++){
+          for (var i = 0; i < N; i++){
+            var idx = j * N + i, o = idx * 3;
+            var x = (i / (N - 1) - 0.5) * W;
+            var y = (0.5 - j / (N - 1)) * H;
+            pos[o] = home[o] = x;
+            pos[o + 1] = home[o + 1] = y;
+            pos[o + 2] = home[o + 2] = drape(x, y);
+            prev[o] = pos[o]; prev[o + 1] = pos[o + 1]; prev[o + 2] = pos[o + 2];
+            pinned[idx] = (j === 0) ? 1 : 0;
+          }
+        }
+      }
+      resetCloth();
+
+      var constraints = [];
+      (function(){
+        var sx = W / (N - 1), sy = H / (N - 1);
+        for (var j = 0; j < N; j++){
+          for (var i = 0; i < N; i++){
+            var a = j * N + i;
+            if (i < N - 1) constraints.push([a, a + 1, sx]);
+            if (j < N - 1) constraints.push([a, a + N, sy]);
+          }
+        }
+      })();
+
+      var geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      (function(){
+        var uv = new Float32Array(count * 2);
+        var index = [];
+        for (var j = 0; j < N; j++){
+          for (var i = 0; i < N; i++){
+            var idx = j * N + i;
+            uv[idx * 2] = i / (N - 1);
+            uv[idx * 2 + 1] = 1 - j / (N - 1);
+            if (i < N - 1 && j < N - 1){
+              var a = idx, b = idx + 1, c2 = idx + N, d = idx + N + 1;
+              index.push(a, c2, b, b, c2, d);
+            }
+          }
+        }
+        geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+        geometry.setIndex(index);
+        geometry.computeVertexNormals();
+      })();
+      var cloth = new THREE.Mesh(geometry, foilMat);
+      cloth.frustumCulled = false;
+      scene.add(cloth);
+
+      var DAMPING = 0.972, STIFF = 0.22, PASSES = 6;
+      var simTime = 0;
+      function stepCloth(dt){
+        simTime += dt;
+        var driftA = reduced ? 0 : 0.00006;                       // alive at rest
+        var bob = reduced ? 0 : Math.sin(simTime * (Math.PI * 2 / 70)) * 0.012; // 70 s bob
+        var t = simTime;
+        for (var n = 0; n < count; n++){
+          var o = n * 3;
+          if (pinned[n]){
+            pos[o] = home[o]; pos[o + 1] = home[o + 1]; pos[o + 2] = home[o + 2] + bob * 0.2;
+            prev[o] = pos[o]; prev[o + 1] = pos[o + 1]; prev[o + 2] = pos[o + 2];
+            continue;
+          }
+          var x = pos[o], y = pos[o + 1], z = pos[o + 2];
+          var vx = (x - prev[o]) * DAMPING;
+          var vy = (y - prev[o + 1]) * DAMPING;
+          var vz = (z - prev[o + 2]) * DAMPING;
+          prev[o] = x; prev[o + 1] = y; prev[o + 2] = z;
+          // no gravity — only the faintest living drift + bob
+          var fx = Math.sin(t * 0.6 + y * 1.7 + x * 0.6) * driftA;
+          var fz = Math.cos(t * 0.45 + x * 2.1 + y) * driftA * 1.6;
+          pos[o] = x + vx + fx;
+          pos[o + 1] = y + vy;
+          pos[o + 2] = z + vz + fz + bob * 0.0016;
+          // very soft pull home so it settles instead of wandering
+          pos[o] += (home[o] - pos[o]) * 0.0012;
+          pos[o + 2] += (home[o + 2] - pos[o + 2]) * 0.0012;
+        }
+        // grabbed particles follow the pointer
+        if (grab.active){
+          for (var gi = 0; gi < grab.particles.length; gi++){
+            var gp = grab.particles[gi], go = gp.idx * 3;
+            var tx = gp.sx + grab.dx * gp.w, ty = gp.sy + grab.dy * gp.w, tz = gp.sz + grab.dz * gp.w;
+            var nx = pos[go] + (tx - pos[go]) * 0.31;      // lerp 0.31
+            var ny = pos[go + 1] + (ty - pos[go + 1]) * 0.31;
+            var nz = pos[go + 2] + (tz - pos[go + 2]) * 0.31;
+            // keep a whisper of the motion in prev -> momentum flick on release
+            prev[go] = pos[go] - (nx - pos[go]) * 0.35;
+            prev[go + 1] = pos[go + 1] - (ny - pos[go + 1]) * 0.35;
+            prev[go + 2] = pos[go + 2] - (nz - pos[go + 2]) * 0.35;
+            pos[go] = nx; pos[go + 1] = ny; pos[go + 2] = nz;
+          }
+        }
+        for (var p = 0; p < PASSES; p++){
+          for (var ci = 0; ci < constraints.length; ci++){
+            var cn = constraints[ci], a = cn[0], b = cn[1], rest = cn[2];
+            var ao = a * 3, bo = b * 3;
+            var dx = pos[bo] - pos[ao], dy = pos[bo + 1] - pos[ao + 1], dz = pos[bo + 2] - pos[ao + 2];
+            var d = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.0001;
+            var diff = (d - rest) / d * STIFF;
+            var pa = pinned[a], pb = pinned[b];
+            var wa = pa ? 0 : (pb ? 1 : 0.5), wb = pb ? 0 : (pa ? 1 : 0.5);
+            pos[ao] += dx * diff * wa; pos[ao + 1] += dy * diff * wa; pos[ao + 2] += dz * diff * wa;
+            pos[bo] -= dx * diff * wb; pos[bo + 1] -= dy * diff * wb; pos[bo + 2] -= dz * diff * wb;
+          }
+        }
+      }
+
+      /* ---------- Grab + orbit input ---------- */
+      var raycaster = new THREE.Raycaster();
+      var pointerV = new THREE.Vector2();
+      var dragPlane = new THREE.Plane();
+      var hitPoint = new THREE.Vector3();
+      var planeHit = new THREE.Vector3();
+      var grab = { active:false, particles:[], dx:0, dy:0, dz:0, sx:0, sy:0, sz:0 };
+      var orbit = { active:false, lx:0, ly:0 };
+      var lastTap = 0, lastTapX = 0, lastTapY = 0;
+
+      function setPointer(e){
+        var r = canvas.getBoundingClientRect();
+        pointerV.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+        pointerV.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      }
+      function resetAll(){
+        resetCloth();
+        geometry.attributes.position.needsUpdate = true;
+        camTarget.theta = CAM.defTheta; camTarget.phi = CAM.defPhi; camTarget.dist = CAM.defDist;
+      }
+      canvas.addEventListener("pointerdown", function(e){
+        var now = performance.now();
+        if (now - lastTap < 300 && Math.abs(e.clientX - lastTapX) < 42 && Math.abs(e.clientY - lastTapY) < 42){
+          resetAll(); lastTap = 0; return;
+        }
+        lastTap = now; lastTapX = e.clientX; lastTapY = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+        setPointer(e);
+        raycaster.setFromCamera(pointerV, camera);
+        var hits = raycaster.intersectObject(cloth);
+        if (hits.length){
+          hitPoint.copy(hits[0].point);
+          // nearest particle to the hit
+          var best = -1, bestD = Infinity;
+          for (var n = 0; n < count; n++){
+            var o = n * 3;
+            var ddx = pos[o] - hitPoint.x, ddy = pos[o + 1] - hitPoint.y, ddz = pos[o + 2] - hitPoint.z;
+            var dd = ddx * ddx + ddy * ddy + ddz * ddz;
+            if (dd < bestD){ bestD = dd; best = n; }
+          }
+          var gi = best % N, gj = Math.floor(best / N);
+          grab.particles = [];
+          for (var dj = -2; dj <= 2; dj++){           // 5 x 5 neighbourhood
+            for (var di = -2; di <= 2; di++){
+              var ii = gi + di, jj = gj + dj;
+              if (ii < 0 || jj < 0 || ii >= N || jj >= N) continue;
+              var idx = jj * N + ii, io = idx * 3;
+              var w = Math.exp(-(di * di + dj * dj) / (2 * 1.25 * 1.25)); // Gaussian falloff
+              grab.particles.push({ idx: idx, w: w, sx: pos[io], sy: pos[io + 1], sz: pos[io + 2] });
+            }
+          }
+          grab.sx = hitPoint.x; grab.sy = hitPoint.y; grab.sz = hitPoint.z;
+          grab.dx = 0; grab.dy = 0; grab.dz = 0;
+          var nrm = new THREE.Vector3();
+          camera.getWorldDirection(nrm);
+          dragPlane.setFromNormalAndCoplanarPoint(nrm, hitPoint); // camera-facing plane
+          grab.active = true;
+          canvas.classList.add("grabbing");
+        } else {
+          orbit.active = true; orbit.lx = e.clientX; orbit.ly = e.clientY;
+        }
+      });
+      canvas.addEventListener("pointermove", function(e){
+        if (grab.active){
+          setPointer(e);
+          raycaster.setFromCamera(pointerV, camera);
+          if (raycaster.ray.intersectPlane(dragPlane, planeHit)){
+            grab.dx = planeHit.x - grab.sx;
+            grab.dy = planeHit.y - grab.sy;
+            grab.dz = planeHit.z - grab.sz;
+          }
+        } else if (orbit.active){
+          var dx = e.clientX - orbit.lx, dy = e.clientY - orbit.ly;
+          orbit.lx = e.clientX; orbit.ly = e.clientY;
+          camTarget.theta -= dx * 0.0052 * 0.30 * 3.4;
+          camTarget.phi -= dy * 0.0052 * 0.30 * 3.4;
+          camTarget.phi = Math.max(0.32, Math.min(2.55, camTarget.phi));
+        }
+      });
+      function endPointer(){
+        grab.active = false; grab.particles = [];
+        orbit.active = false;
+        canvas.classList.remove("grabbing");
+      }
+      canvas.addEventListener("pointerup", endPointer);
+      canvas.addEventListener("pointercancel", endPointer);
+      canvas.addEventListener("wheel", function(e){
+        e.preventDefault();
+        camTarget.dist = Math.max(2.8, Math.min(8.8, camTarget.dist + e.deltaY * 0.004));
+      }, { passive:false });
+
+      /* ---------- Resize / loop / safeguards ---------- */
+      function resize(){
+        var w = stage.clientWidth, h = stage.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      if (window.ResizeObserver) new ResizeObserver(resize).observe(stage);
+      window.addEventListener("resize", resize);
+      resize();
+
+      var STEP = 1 / 60, acc = 0, last = performance.now(), hidden = false;
+      document.addEventListener("visibilitychange", function(){
+        hidden = document.hidden;
+        last = performance.now();
+      });
+      function loop(now){
+        requestAnimationFrame(loop);
+        if (hidden) return;
+        var frame = Math.min((now - last) / 1000, 0.25);
+        last = now;
+        acc += frame;
+        var steps = 0;
+        while (acc >= STEP && steps < 3){ stepCloth(STEP); acc -= STEP; steps++; } // fixed 60 Hz, max 3 per frame
+        if (steps === 3) acc = 0;
+        camCur.theta += (camTarget.theta - camCur.theta) * 0.084;
+        camCur.phi += (camTarget.phi - camCur.phi) * 0.084;
+        camCur.dist += (camTarget.dist - camCur.dist) * 0.084;
+        placeCamera();
+        geometry.attributes.position.needsUpdate = true;
+        geometry.computeVertexNormals();
+        foilMat.uniforms.uTime.value = simTime;
+        renderer.render(scene, camera);
+      }
+      placeCamera();
+      requestAnimationFrame(loop);
+    })();
+    </script>
+  </body>
+</html>
