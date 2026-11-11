@@ -140,6 +140,9 @@
         width:104px; height:104px; border:2.5px solid var(--stamp); border-radius:50%;
         color:var(--stamp); font-size:12px; letter-spacing:.18em; margin-bottom:20px; transform:rotate(-9deg);
       }
+      .stage .poster img{
+        width:120px; height:120px; border-radius:50%; display:block; margin:0 auto 20px;
+      }
       .stage-tag{
         position:absolute; left:18px; bottom:16px; z-index:4; pointer-events:none;
         font-family:var(--font-mono); font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:rgba(233,228,216,.72);
@@ -315,6 +318,7 @@
             <div class="glow" aria-hidden="true"></div>
             <div class="poster" aria-hidden="true">
               <div>
+                <img src="https://neoruins.com/x-media/neoruins-logo.jpg" alt="" />
                 <span class="stamp-ring">NEORUINS™<br/>EST. ONLINE</span>
                 <div>NEORUINS™<br/>AI made simple<br/><span style="font-size:12px;opacity:.75;">Prompts · Tools · Plain English</span></div>
               </div>
@@ -641,7 +645,7 @@
         g.fillText("PROMPTS · TOOLS · PLAIN ENGLISH", c.width / 2, 668);
         // stamp
         g.save();
-        g.translate(800, 330); g.rotate(-0.16);
+        g.translate(820, 1050); g.rotate(-0.16);
         g.globalAlpha = 0.9;
         g.strokeStyle = "#7cbc54"; g.lineWidth = 5;
         g.beginPath(); g.arc(0, 0, 108, 0, Math.PI * 2); g.stroke();
@@ -659,6 +663,26 @@
         g.globalAlpha = 1;
         var tex = new THREE.CanvasTexture(c);
         tex.anisotropy = 4;
+        // the knight logo, printed on the cloth like a flag emblem:
+        // a circular clip keeps the ring clean, and it loads with
+        // CORS on (GitHub Pages sends Access-Control-Allow-Origin: *),
+        // so the texture stays WebGL-usable. If the image never
+        // arrives, the text print above stands on its own.
+        var logo = new Image();
+        logo.crossOrigin = "anonymous";
+        logo.onload = function(){
+          try {
+            g.save();
+            g.beginPath();
+            g.arc(512, 310, 196, 0, Math.PI * 2);
+            g.clip();
+            g.drawImage(logo, 312, 110, 400, 400);
+            g.restore();
+            tex.needsUpdate = true;
+          } catch (e) { /* text print stands */ }
+        };
+        logo.onerror = function(){ /* text print stands */ };
+        logo.src = "https://neoruins.com/x-media/neoruins-logo.jpg";
         return tex;
       }
 
