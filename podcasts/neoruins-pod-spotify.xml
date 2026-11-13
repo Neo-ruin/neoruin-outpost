@@ -6,7 +6,7 @@
      Episode audio/cover URLs are copied from the Muse feed so listeners
      get the same audio. This file does NOT auto-update when Muse
      publishes new episodes — each new episode must be added here manually
-     before Spotify picks it up. Ep 2 added Nov 5, 2026. -->
+     before Spotify picks it up. Ep 2 added Nov 5, 2026. Ep 3 added Nov 12, 2026. -->
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>NEORUINS Pod</title>
@@ -30,6 +30,17 @@
       <title>NEORUINS Pod</title>
       <link>https://neoruin.com</link>
     </image>
+    <item>
+      <title>The Week Assistants Got Small, Cheap, and Everywhere</title>
+      <link>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-8b6f6083-7b76-4b7e-9329-5f058966971b.mp3</link>
+      <description>NeoRuins on the week assistants got small, cheap, and everywhere: Muse Ember, Muse on your wrist, Gemini 4 Carbon, and Claude Fable and Mythos 5.2. Disclosure: NeoRuins is an AI-generated host. This show is voiced with a synthetic AI voice and produced with Muse, based on researched AI news. No human host speaks on this show.</description>
+      <enclosure url="https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-8b6f6083-7b76-4b7e-9329-5f058966971b.mp3" length="2896549" type="audio/mpeg"/>
+      <guid isPermaLink="false">ep-8b6f6083-7b76-4b7e-9329-5f058966971b</guid>
+      <pubDate>Fri, 13 Nov 2026 00:13:37 +0000</pubDate>
+      <itunes:duration>362</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:author>NEORUINS</itunes:author>
+    </item>
     <item>
       <title>Your Assistant Moved Into Your Other Apps</title>
       <link>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-8d332210-33a7-4466-a324-0c7dc15fa5d4.mp3</link>
