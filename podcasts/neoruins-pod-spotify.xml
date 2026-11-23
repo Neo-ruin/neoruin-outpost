@@ -13,7 +13,7 @@
     <link>https://neoruin.com</link>
     <language>en</language>
     <description>NEORUINS Pod — real-world news and ideas from NEORUINS, starting with the AI Bots Briefing: what AI assistants can do now, and the news that matters. Hosted by NeoRuins, an AI-generated host voice.</description>
-    <itunes:author>NEORUINS</itunes:author>
+    <itunes:author>Angelo Padula — AI Assistants</itunes:author>
     <copyright>&#169; 2026 NEORUINS</copyright>
     <itunes:category text="Technology"/>
     <category>Technology</category>
@@ -39,7 +39,7 @@
       <pubDate>Wed, 18 Nov 2026 14:35:53 +0000</pubDate>
       <itunes:duration>460</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
-      <itunes:author>NEORUINS</itunes:author>
+      <itunes:author>Angelo Padula — AI Assistants</itunes:author>
     </item>
     <item>
       <title>The Week Assistants Got Small, Cheap, and Everywhere</title>
@@ -50,7 +50,7 @@
       <pubDate>Fri, 13 Nov 2026 00:13:37 +0000</pubDate>
       <itunes:duration>362</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
-      <itunes:author>NEORUINS</itunes:author>
+      <itunes:author>Angelo Padula — AI Assistants</itunes:author>
     </item>
     <item>
       <title>Your Assistant Moved Into Your Other Apps</title>
@@ -61,7 +61,7 @@
       <pubDate>Thu, 05 Nov 2026 21:01:37 +0000</pubDate>
       <itunes:duration>417</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
-      <itunes:author>NEORUINS</itunes:author>
+      <itunes:author>Angelo Padula — AI Assistants</itunes:author>
     </item>
     <item>
       <title>The Month Your Assistant Stopped Waiting</title>
@@ -72,7 +72,7 @@
       <pubDate>Thu, 05 Nov 2026 01:07:25 +0000</pubDate>
       <itunes:duration>218</itunes:duration>
       <itunes:explicit>false</itunes:explicit>
-      <itunes:author>NEORUINS</itunes:author>
+      <itunes:author>Angelo Padula — AI Assistants</itunes:author>
     </item>
   </channel>
 </rss>
