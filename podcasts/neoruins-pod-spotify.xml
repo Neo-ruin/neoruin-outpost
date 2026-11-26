@@ -6,7 +6,7 @@
      Episode audio/cover URLs are copied from the Muse feed so listeners
      get the same audio. This file does NOT auto-update when Muse
      publishes new episodes — each new episode must be added here manually
-     before Spotify picks it up. Ep 2 added Nov 5, 2026. Ep 3 added Nov 12, 2026. Ep 4 added Nov 18, 2026. -->
+     before Spotify picks it up. Ep 2 added Nov 5, 2026. Ep 3 added Nov 12, 2026. Ep 4 added Nov 18, 2026. Ep 5 added Nov 25, 2026. -->
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>NEORUINS Pod</title>
@@ -30,6 +30,17 @@
       <title>NEORUINS Pod</title>
       <link>https://neoruin.com</link>
     </image>
+    <item>
+      <title>Your Assistant's Work Left the Chat</title>
+      <link>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-2c1dc96a-6161-4871-b0a9-23707c3c5a04.mp3</link>
+      <description>NeoRuins on the week assistant work stopped living in chat: ChatGPT Space reaches Plus, Claude artifacts install as desktop apps, Claude Ship reviews, fixes, and approves pull requests, and Google makes Workspace MCP servers and CLI generally available. Disclosure: NeoRuins is an AI-generated host. This show is voiced with a synthetic AI voice and produced with Muse, based on researched AI news. No human host speaks on this show.</description>
+      <enclosure url="https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-2c1dc96a-6161-4871-b0a9-23707c3c5a04.mp3" length="3611262" type="audio/mpeg"/>
+      <guid isPermaLink="false">ep-2c1dc96a-6161-4871-b0a9-23707c3c5a04</guid>
+      <pubDate>Thu, 26 Nov 2026 00:12:04 +0000</pubDate>
+      <itunes:duration>449</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:author>NEORUINS AI Assistant</itunes:author>
+    </item>
     <item>
       <title>Assistants Get a Standing Assignment</title>
       <link>https://muse.ai/podcasts/media/1403055632888693/aa7e9b38-8719-435c-bac4-17e28983d342/ep-f2665e74-a418-443a-a26a-82e9c9f42dff.mp3</link>
